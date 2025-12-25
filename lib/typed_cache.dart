@@ -1,8 +1,10 @@
-/// Support for doing something awesome.
-///
-/// More dartdocs go here.
 library;
 
-export 'src/typed_cache_base.dart';
-
-// TODO: Export any libraries intended for clients of this package.
+export 'src/backend.dart';
+export 'src/cache_store.dart';
+export 'src/codec.dart';
+export 'src/entry.dart';
+export 'src/errors.dart';
+export 'src/policy/clock.dart';
+export 'src/policy/ttl_policy.dart';
+export 'src/typed_cache.dart';
