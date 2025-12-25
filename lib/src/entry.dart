@@ -1,9 +1,9 @@
-class CacheEntry {
+class CacheEntry<E> {
   final String key;
   final String typeId;
 
   /// Backend stores this as JSON string/blob/etc.
-  final Object payload;
+  final E payload;
 
   /// Epoch milliseconds.
   final int createdAtEpochMs;
@@ -24,7 +24,7 @@ class CacheEntry {
   });
 
   CacheEntry copyWith({
-    Object? payload,
+    E? payload,
     int? createdAtEpochMs,
     int? expiresAtEpochMs,
     Set<String>? tags,

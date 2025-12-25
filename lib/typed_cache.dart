@@ -1,7 +1,6 @@
 library;
 
 export 'src/backend.dart';
-export 'src/cache_store.dart';
 export 'src/codec.dart';
 export 'src/entry.dart';
 export 'src/errors.dart';

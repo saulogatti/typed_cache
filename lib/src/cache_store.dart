@@ -45,9 +45,9 @@ final class CacheStore implements TypedCache {
   }
 
   @override
-  Future<T?> get<T>(
+  Future<D?> get<E, D extends Object>(
     String key, {
-    required CacheCodec<T> codec,
+    required CacheCodec<E, D> codec,
     bool allowExpired = false,
   }) async {
     final now = _clock.nowEpochMs();
@@ -105,15 +105,15 @@ final class CacheStore implements TypedCache {
   }
 
   @override
-  Future<T> getOrFetch<T>(
+  Future<D> getOrFetch<E, D extends Object>(
     String key, {
-    required CacheCodec<T> codec,
-    required Future<T> Function() fetch,
+    required CacheCodec<E, D> codec,
+    required Future<D> Function() fetch,
     Duration? ttl,
     Set<String> tags = const {},
     bool allowExpiredWhileRevalidating = false,
   }) async {
-    final cached = await get<T>(
+    final cached = await get<E, D>(
       key,
       codec: codec,
       allowExpired: allowExpiredWhileRevalidating,
@@ -126,7 +126,7 @@ final class CacheStore implements TypedCache {
       // We return cached and refresh in the same async chain (best effort).
       try {
         final fresh = await fetch();
-        await put<T>(key, fresh, codec: codec, ttl: ttl, tags: tags);
+        await put<E, D>(key, fresh, codec: codec, ttl: ttl, tags: tags);
       } catch (e, st) {
         _log?.call('SWR refresh failed for key="$key"', e, st);
       }
@@ -134,7 +134,7 @@ final class CacheStore implements TypedCache {
     }
 
     final fresh = await fetch();
-    await put<T>(key, fresh, codec: codec, ttl: ttl, tags: tags);
+    await put<E, D>(key, fresh, codec: codec, ttl: ttl, tags: tags);
     return fresh;
   }
 
@@ -172,10 +172,10 @@ final class CacheStore implements TypedCache {
   }
 
   @override
-  Future<void> put<T>(
+  Future<void> put<E, D extends Object>(
     String key,
-    T value, {
-    required CacheCodec<T> codec,
+    D value, {
+    required CacheCodec<E, D> codec,
     Duration? ttl,
     Set<String> tags = const {},
   }) async {

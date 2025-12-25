@@ -5,16 +5,16 @@ abstract interface class TypedCache {
 
   Future<bool> contains(String key);
 
-  Future<T?> get<T>(
+  Future<D?> get<E, D extends Object>(
     String key, {
-    required CacheCodec<T> codec,
+    required CacheCodec<E, D> codec,
     bool allowExpired = false,
   });
 
-  Future<T> getOrFetch<T>(
+  Future<D> getOrFetch<E, D extends Object>(
     String key, {
-    required CacheCodec<T> codec,
-    required Future<T> Function() fetch,
+    required CacheCodec<E, D> codec,
+    required Future<D> Function() fetch,
     Duration? ttl,
     Set<String> tags,
     bool allowExpiredWhileRevalidating = false,
@@ -27,10 +27,10 @@ abstract interface class TypedCache {
   /// Optional maintenance hook (e.g. remove expired entries).
   Future<int> purgeExpired();
 
-  Future<void> put<T>(
+  Future<void> put<E, D extends Object>(
     String key,
-    T value, {
-    required CacheCodec<T> codec,
+    D value, {
+    required CacheCodec<E, D> codec,
     Duration? ttl,
     Set<String> tags,
   });
