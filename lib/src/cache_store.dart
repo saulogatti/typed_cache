@@ -162,7 +162,7 @@ final class CacheStore implements TypedCache {
 
   @override
   Future<void> invalidateByTag(String tag) async {
-    final keys = await _backend.keysByTag(tag);
+    final keys = (await _backend.keysByTag(tag)).toList();
     // Best-effort delete all keys with this tag.
     for (final k in keys) {
       try {
