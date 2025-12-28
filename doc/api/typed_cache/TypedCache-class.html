@@ -26,7 +26,7 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">typed_cache</a></li>
     <li><a href="../typed_cache/">typed_cache.dart</a></li>
-    <li class="self-crumb">TypedCache class</li>
+    <li class="self-crumb">TypedCache<span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends <a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></span>&gt;</span> class</li>
   </ol>
   <div class="self-name">TypedCache</div>
   <form class="search navbar-right" role="search">
@@ -48,7 +48,7 @@
     data-above-sidebar="typed_cache&#47;typed_cache-library-sidebar.html"
     data-below-sidebar="typed_cache&#47;TypedCache-class-sidebar.html">
     <div>
-<h1><span class="kind-class">TypedCache</span> class 
+<h1><span class="kind-class">TypedCache&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends Object</span>&gt;</span> class 
     <a href="https://dart.dev/language/class-modifiers#abstract" class="feature feature-abstract" title="This type can not be directly constructed.">abstract</a>
     <a href="https://dart.dev/language/class-modifiers#interface" class="feature feature-interface" title="This class can only be implemented (not extended or mixed in).">interface</a>
  
@@ -68,10 +68,22 @@ TTL policies, tag-based invalidation, and type-safe generic operations.</p>
     
     
   <section
-      class="summary offset-anchor inherited"
+      class="summary offset-anchor"
       id="instance-properties">
     <h2>Properties</h2>
     <dl class="properties">
+        <dt id="defaultCodec" class="property">
+  <span class="name"><a href="../typed_cache/TypedCache/defaultCodec.html">defaultCodec</a></span>
+  <span class="signature">&#8594; <a href="../typed_cache/CacheCodec-class.html">CacheCodec</a><span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D</span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
         <dt id="hashCode" class="property inherited">
   <span class="name"><a href="https://api.flutter.dev/flutter/dart-core/Object/hashCode.html">hashCode</a></span>
   <span class="signature">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span>
@@ -132,7 +144,7 @@ TTL policies, tag-based invalidation, and type-safe generic operations.</p>
 </dd>
 
         <dt id="get" class="callable">
-  <span class="name"><a href="../typed_cache/TypedCache/get.html">get</a></span><span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends <a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="get-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, {</span><span class="parameter" id="get-param-codec"><span>required</span> <span class="type-annotation"><a href="../typed_cache/CacheCodec-class.html">CacheCodec</a><span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D</span>&gt;</span></span> <span class="parameter-name">codec</span>, </span><span class="parameter" id="get-param-allowExpired"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowExpired</span> = <span class="default-value">false</span></span>})
+  <span class="name"><a href="../typed_cache/TypedCache/get.html">get</a></span><span class="signature">(<wbr><span class="parameter" id="get-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, {</span><span class="parameter" id="get-param-allowExpired"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowExpired</span> = <span class="default-value">false</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">D?</span>&gt;</span></span>
   </span>
   
@@ -144,8 +156,22 @@ TTL policies, tag-based invalidation, and type-safe generic operations.</p>
 
 </dd>
 
+        <dt id="getAll" class="callable">
+  <span class="name"><a href="../typed_cache/TypedCache/getAll.html">getAll</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter">D</span>&gt;</span></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Retrieves all valid, non-expired values from the cache that match the
+store's default codec.
+  
+
+</dd>
+
         <dt id="getOrFetch" class="callable">
-  <span class="name"><a href="../typed_cache/TypedCache/getOrFetch.html">getOrFetch</a></span><span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends <a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="getOrFetch-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, {</span><span class="parameter" id="getOrFetch-param-codec"><span>required</span> <span class="type-annotation"><a href="../typed_cache/CacheCodec-class.html">CacheCodec</a><span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D</span>&gt;</span></span> <span class="parameter-name">codec</span>, </span><span class="parameter" id="getOrFetch-param-fetch"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">D</span>&gt;</span></span> <span class="parameter-name">fetch</span>(), </span><span class="parameter" id="getOrFetch-param-ttl"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Duration-class.html">Duration</a>?</span> <span class="parameter-name">ttl</span>, </span><span class="parameter" id="getOrFetch-param-tags"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span> <span class="parameter-name">tags</span>, </span><span class="parameter" id="getOrFetch-param-allowExpiredWhileRevalidating"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowExpiredWhileRevalidating</span> = <span class="default-value">false</span></span>})
+  <span class="name"><a href="../typed_cache/TypedCache/getOrFetch.html">getOrFetch</a></span><span class="signature">(<wbr><span class="parameter" id="getOrFetch-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, {</span><span class="parameter" id="getOrFetch-param-fetch"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">D</span>&gt;</span></span> <span class="parameter-name">fetch</span>(), </span><span class="parameter" id="getOrFetch-param-ttl"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Duration-class.html">Duration</a>?</span> <span class="parameter-name">ttl</span>, </span><span class="parameter" id="getOrFetch-param-tags"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span> <span class="parameter-name">tags</span>, </span><span class="parameter" id="getOrFetch-param-allowExpiredWhileRevalidating"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowExpiredWhileRevalidating</span> = <span class="default-value">false</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">D</span>&gt;</span></span>
   </span>
   
@@ -210,7 +236,7 @@ TTL policies, tag-based invalidation, and type-safe generic operations.</p>
 </dd>
 
         <dt id="put" class="callable">
-  <span class="name"><a href="../typed_cache/TypedCache/put.html">put</a></span><span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends <a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="put-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, </span><span class="parameter" id="put-param-value"><span class="type-annotation">D</span> <span class="parameter-name">value</span>, {</span><span class="parameter" id="put-param-codec"><span>required</span> <span class="type-annotation"><a href="../typed_cache/CacheCodec-class.html">CacheCodec</a><span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D</span>&gt;</span></span> <span class="parameter-name">codec</span>, </span><span class="parameter" id="put-param-ttl"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Duration-class.html">Duration</a>?</span> <span class="parameter-name">ttl</span>, </span><span class="parameter" id="put-param-tags"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span> <span class="parameter-name">tags</span></span>})
+  <span class="name"><a href="../typed_cache/TypedCache/put.html">put</a></span><span class="signature">(<wbr><span class="parameter" id="put-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, </span><span class="parameter" id="put-param-value"><span class="type-annotation">D</span> <span class="parameter-name">value</span>, {</span><span class="parameter" id="put-param-ttl"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Duration-class.html">Duration</a>?</span> <span class="parameter-name">ttl</span>, </span><span class="parameter" id="put-param-tags"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span> <span class="parameter-name">tags</span></span>})
     <span class="returntype parameter">&#8594; <a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
   </span>
   
@@ -286,7 +312,7 @@ TTL policies, tag-based invalidation, and type-safe generic operations.</p>
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../index.html">typed_cache</a></li>
     <li><a href="../typed_cache/">typed_cache</a></li>
-    <li class="self-crumb">TypedCache class</li>
+    <li class="self-crumb">TypedCache<span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends <a href="https://api.flutter.dev/flutter/dart-core/Object-class.html">Object</a></span>&gt;</span> class</li>
 </ol>
 
     <h5>typed_cache library</h5>
@@ -298,7 +324,7 @@ TTL policies, tag-based invalidation, and type-safe generic operations.</p>
 <footer>
   <span class="no-break">
     typed_cache
-      0.1.0
+      0.2.0
   </span>
   
 </footer>

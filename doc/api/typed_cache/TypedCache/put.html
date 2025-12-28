@@ -26,8 +26,8 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../../index.html">typed_cache</a></li>
     <li><a href="../../typed_cache/">typed_cache.dart</a></li>
-    <li><a href="../../typed_cache/TypedCache-class.html">TypedCache</a></li>
-    <li class="self-crumb">put&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends Object</span>&gt; abstract method</li>
+    <li><a href="../../typed_cache/TypedCache-class.html">TypedCache<span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends Object</span>&gt;</span></a></li>
+    <li class="self-crumb">put abstract method</li>
   </ol>
   <div class="self-name">put</div>
   <form class="search navbar-right" role="search">
@@ -49,15 +49,14 @@
     data-above-sidebar="typed_cache&#47;TypedCache-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">put&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends Object</span>&gt;</span> abstract method 
+<h1><span class="kind-method">put</span> abstract method 
 </h1></div>
 
     <section class="multi-line-signature">
       
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
-<span class="name ">put</span>&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends Object</span>&gt;(<wbr><ol class="parameter-list"> <li><span class="parameter" id="put-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, </span></li>
+<span class="name ">put</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="put-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, </span></li>
 <li><span class="parameter" id="put-param-value"><span class="type-annotation">D</span> <span class="parameter-name">value</span>, {</span></li>
-<li><span class="parameter" id="put-param-codec"><span>required</span> <span class="type-annotation"><a href="../../typed_cache/CacheCodec-class.html">CacheCodec</a><span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D</span>&gt;</span></span> <span class="parameter-name">codec</span>, </span></li>
 <li><span class="parameter" id="put-param-ttl"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Duration-class.html">Duration</a>?</span> <span class="parameter-name">ttl</span>, </span></li>
 <li><span class="parameter" id="put-param-tags"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>&gt;</span></span> <span class="parameter-name">tags</span>, </span></li>
 </ol>})
@@ -72,7 +71,6 @@
 <ul>
 <li><code>key</code>: The cache key</li>
 <li><code>value</code>: The value to cache</li>
-<li><code>codec</code>: The codec for encoding the value</li>
 <li><code>ttl</code>: Optional time-to-live (null = no expiration)</li>
 <li><code>tags</code>: Optional tags for grouped invalidation</li>
 </ul>
@@ -83,13 +81,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; put&lt;E, D extends Object&gt;(
-  String key,
-  D value, {
-  required CacheCodec&lt;E, D&gt; codec,
-  Duration? ttl,
-  Set&lt;String&gt; tags,
-});</code></pre>
+  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; put(String key, D value, {Duration? ttl, Set&lt;String&gt; tags});</code></pre>
 </section>
 
 
@@ -104,8 +96,8 @@
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../../index.html">typed_cache</a></li>
     <li><a href="../../typed_cache/">typed_cache</a></li>
-    <li><a href="../../typed_cache/TypedCache-class.html">TypedCache</a></li>
-    <li class="self-crumb">put&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends Object</span>&gt; abstract method</li>
+    <li><a href="../../typed_cache/TypedCache-class.html">TypedCache<span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends Object</span>&gt;</span></a></li>
+    <li class="self-crumb">put abstract method</li>
 </ol>
 
     <h5>TypedCache class</h5>
@@ -117,7 +109,7 @@
 <footer>
   <span class="no-break">
     typed_cache
-      0.1.0
+      0.2.0
   </span>
   
 </footer>

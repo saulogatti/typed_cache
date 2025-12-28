@@ -69,7 +69,7 @@
 <section class="desc markdown">
   <p>Stable identifier for this codec's type and schema version.</p>
 <p>This is stored with the cache entry to detect type mismatches.
-Examples: 'user:v1', 'product:v2', 'List<int>:v1'</int></p>
+Examples: 'user:v1', 'product:v2', 'List:v1'</p>
 <p><strong>Important:</strong> Never change a typeId for existing entries; instead,
 increment the version (e.g., 'user:v2'). This prevents silent
 corruption when the codec logic changes.</p>
@@ -108,7 +108,7 @@ corruption when the codec logic changes.</p>
 <footer>
   <span class="no-break">
     typed_cache
-      0.1.0
+      0.2.0
   </span>
   
 </footer>

@@ -44,95 +44,95 @@
       
 <section class="desc markdown">
   <h1 id="typed-cache">Typed Cache</h1>
-<p>Um pacote Dart de cache <strong>type-safe</strong> com suporte a políticas de retenção (TTL), múltiplos backends de armazenamento e codificação flexível.</p>
+<p>A <strong>type-safe</strong> Dart caching package with support for retention policies (TTL), multiple storage backends, and flexible encoding.</p>
 <h2 id="features">Features</h2>
 <ul>
-<li>🔒 <strong>Type-safe:</strong> Cache com total suporte a tipos genéricos em Dart</li>
-<li>⏰ <strong>TTL Policies:</strong> Controle de tempo de vida dos itens em cache com política configurável</li>
-<li>🔌 <strong>Pluggable Backends:</strong> Suporte para múltiplos backends de armazenamento</li>
-<li>🔄 <strong>Flexible Encoding:</strong> Codecs customizáveis para serialização/desserialização</li>
-<li>🎯 <strong>Clean Architecture:</strong> Arquitetura modular e desacoplada</li>
-<li>📝 <strong>Type Entries:</strong> Entrada tipada com metadados e timestamps</li>
+<li>🔒 <strong>Type-safe:</strong> Fully type-safe cache with generic type support in Dart</li>
+<li>⏰ <strong>TTL Policies:</strong> Cache item lifetime control with configurable policies</li>
+<li>🔌 <strong>Pluggable Backends:</strong> Support for multiple storage backends</li>
+<li>🔄 <strong>Flexible Encoding:</strong> Customizable codecs for serialization/deserialization</li>
+<li>🎯 <strong>Clean Architecture:</strong> Modular and decoupled architecture</li>
+<li>📝 <strong>Type Entries:</strong> Typed entries with metadata and timestamps</li>
 </ul>
 <h2 id="getting-started">Getting started</h2>
-<h3 id="pr-requisitos">Pré-requisitos</h3>
+<h3 id="prerequisites">Prerequisites</h3>
 <pre class="language-yaml"><code class="language-yaml">environment:
   sdk: ^3.10.4
 </code></pre>
-<h3 id="instalao">Instalação</h3>
-<p>Adicione <code>typed_cache</code> ao seu <code>pubspec.yaml</code>:</p>
+<h3 id="installation">Installation</h3>
+<p>Add <code>typed_cache</code> to your <code>pubspec.yaml</code>:</p>
 <pre class="language-bash"><code class="language-bash">flutter pub add typed_cache
-# ou
+# or
 dart pub add typed_cache
 </code></pre>
 <h2 id="usage">Usage</h2>
-<h3 id="criando-um-cache">Criando um Cache</h3>
+<h3 id="creating-a-cache">Creating a Cache</h3>
 <pre class="language-dart"><code class="language-dart">import 'package:typed_cache/typed_cache.dart';
 
-// Criar um cache com TTL de 5 minutos
+// Create a cache with 5 minutes TTL
 final cache = TypedCache&lt;String, int&gt;(
   backend: InMemoryBackend(),
   policy: TtlPolicy(duration: Duration(minutes: 5)),
 );
 
-// Armazenar um valor
+// Store a value
 await cache.set('counter', 42);
 
-// Recuperar um valor
+// Retrieve a value
 final value = await cache.get('counter');
 print(value); // 42
 
-// Remover um valor
+// Remove a value
 await cache.remove('counter');
 
-// Limpar todo o cache
+// Clear the entire cache
 await cache.clear();
 </code></pre>
-<h3 id="usando-diferentes-backends">Usando Diferentes Backends</h3>
-<pre class="language-dart"><code class="language-dart">// Backend em memória (padrão)
+<h3 id="using-different-backends">Using Different Backends</h3>
+<pre class="language-dart"><code class="language-dart">// In-memory backend (default)
 final memoryCache = TypedCache&lt;String, String&gt;(
   backend: InMemoryBackend(),
 );
 
-// Backend customizado
+// Custom backend
 final customCache = TypedCache&lt;String, User&gt;(
   backend: MyCustomBackend(),
   codec: JsonCodec&lt;User&gt;(),
 );
 </code></pre>
-<h3 id="polticas-de-ttl">Políticas de TTL</h3>
-<pre class="language-dart"><code class="language-dart">// TTL fixo de 1 hora
+<h3 id="ttl-policies">TTL Policies</h3>
+<pre class="language-dart"><code class="language-dart">// Fixed TTL of 1 hour
 final ttlPolicy = TtlPolicy(duration: Duration(hours: 1));
 
-// Usar com clock customizado (útil para testes)
+// Custom clock (useful for testing)
 final testPolicy = TtlPolicy(
   duration: Duration(minutes: 5),
   clock: FakeClock(),
 );
 </code></pre>
-<h2 id="arquitetura">Arquitetura</h2>
+<h2 id="architecture">Architecture</h2>
 <pre class="language-dart"><code>typed_cache/
-├── backend.dart       # Interface abstrata para backends
-├── cache_store.dart   # Armazenamento interno
-├── codec.dart         # Codificação/descodificação
-├── entry.dart         # Entrada tipada com metadados
-├── errors.dart        # Exceções customizadas
-├── typed_cache.dart   # API principal
+├── backend.dart       # Abstract interface for backends
+├── cache_store.dart   # Internal storage
+├── codec.dart         # Encoding/decoding
+├── entry.dart         # Typed entry with metadata
+├── errors.dart        # Custom exceptions
+├── typed_cache.dart   # Main API
 └── policy/
-    ├── clock.dart     # Interface de relógio (para testes)
-    └── ttl_policy.dart # Política de TTL
+    ├── clock.dart     # Clock interface (for testing)
+    └── ttl_policy.dart # TTL policy
 </code></pre>
-<h2 id="contribuindo">Contribuindo</h2>
-<p>As contribuições são bem-vindas! Por favor:</p>
+<h2 id="contributing">Contributing</h2>
+<p>Contributions are welcome! Please:</p>
 <ol>
-<li>Faça um fork do repositório</li>
-<li>Crie uma branch para sua feature (<code>git checkout -b feature/amazing-feature</code>)</li>
-<li>Commit suas mudanças (<code>git commit -m 'Add amazing feature'</code>)</li>
-<li>Push para a branch (<code>git push origin feature/amazing-feature</code>)</li>
-<li>Abra um Pull Request</li>
+<li>Fork the repository</li>
+<li>Create a branch for your feature (<code>git checkout -b feature/amazing-feature</code>)</li>
+<li>Commit your changes (<code>git commit -m 'Add amazing feature'</code>)</li>
+<li>Push to the branch (<code>git push origin feature/amazing-feature</code>)</li>
+<li>Open a Pull Request</li>
 </ol>
-<h2 id="licena">Licença</h2>
-<p>Este projeto está sob a licença MIT. Veja o arquivo <code>LICENSE</code> para mais detalhes.</p>
+<h2 id="license">License</h2>
+<p>This project is licensed under the MIT License. See the <code>LICENSE</code> file for more details.</p>
 </section>
 
 
@@ -174,7 +174,7 @@ flexible encoding support.
 <footer>
   <span class="no-break">
     typed_cache
-      0.1.0
+      0.2.0
   </span>
   
 </footer>

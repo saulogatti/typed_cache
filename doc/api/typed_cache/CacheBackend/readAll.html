@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the write method from the CacheBackend class, for the Dart programming language.">
-  <title>write method - CacheBackend class - typed_cache library - Dart API</title>
+  <meta name="description" content="API docs for the readAll method from the CacheBackend class, for the Dart programming language.">
+  <title>readAll method - CacheBackend class - typed_cache library - Dart API</title>
 
 
   
@@ -27,9 +27,9 @@
     <li><a href="../../index.html">typed_cache</a></li>
     <li><a href="../../typed_cache/">typed_cache.dart</a></li>
     <li><a href="../../typed_cache/CacheBackend-class.html">CacheBackend</a></li>
-    <li class="self-crumb">write&lt;<wbr><span class="type-parameter">E</span>&gt; abstract method</li>
+    <li class="self-crumb">readAll&lt;<wbr><span class="type-parameter">E</span>&gt; abstract method</li>
   </ol>
-  <div class="self-name">write</div>
+  <div class="self-name">readAll</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -49,31 +49,24 @@
     data-above-sidebar="typed_cache&#47;CacheBackend-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">write&lt;<wbr><span class="type-parameter">E</span>&gt;</span> abstract method 
+<h1><span class="kind-method">readAll&lt;<wbr><span class="type-parameter">E</span>&gt;</span> abstract method 
 </h1></div>
 
     <section class="multi-line-signature">
       
-<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
-<span class="name ">write</span>&lt;<wbr><span class="type-parameter">E</span>&gt;(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="write-param-entry"><span class="type-annotation"><a href="../../typed_cache/CacheEntry-class.html">CacheEntry</a><span class="signature">&lt;<wbr><span class="type-parameter">E</span>&gt;</span></span> <span class="parameter-name">entry</span></span></li>
-</ol>)
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../typed_cache/CacheEntry-class.html">CacheEntry</a><span class="signature">&lt;<wbr><span class="type-parameter">E</span>&gt;</span></span>&gt;</span></span>&gt;</span></span>
+<span class="name ">readAll</span>&lt;<wbr><span class="type-parameter">E</span>&gt;(<wbr>)
 
       
 
     </section>
     
-<section class="desc markdown">
-  <p>Writes an encoded cache entry to the backend.</p>
-<p>The entry is already encoded (payload is E, not D). The backend
-must persist it as-is, including metadata (createdAt, expiresAt, tags).</p>
-<p>Throws <a href="../../typed_cache/CacheBackendException-class.html">CacheBackendException</a> if writing fails.</p>
-</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; write&lt;E&gt;(CacheEntry&lt;E&gt; entry);</code></pre>
+  <pre class="language-dart"><code class="language-dart">Future&lt;List&lt;CacheEntry&lt;E&gt;&gt;&gt; readAll&lt;E&gt;();</code></pre>
 </section>
 
 
@@ -89,7 +82,7 @@ must persist it as-is, including metadata (createdAt, expiresAt, tags).</p>
     <li><a href="../../index.html">typed_cache</a></li>
     <li><a href="../../typed_cache/">typed_cache</a></li>
     <li><a href="../../typed_cache/CacheBackend-class.html">CacheBackend</a></li>
-    <li class="self-crumb">write&lt;<wbr><span class="type-parameter">E</span>&gt; abstract method</li>
+    <li class="self-crumb">readAll&lt;<wbr><span class="type-parameter">E</span>&gt; abstract method</li>
 </ol>
 
     <h5>CacheBackend class</h5>

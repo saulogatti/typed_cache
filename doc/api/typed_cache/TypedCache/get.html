@@ -26,8 +26,8 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../../index.html">typed_cache</a></li>
     <li><a href="../../typed_cache/">typed_cache.dart</a></li>
-    <li><a href="../../typed_cache/TypedCache-class.html">TypedCache</a></li>
-    <li class="self-crumb">get&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends Object</span>&gt; abstract method</li>
+    <li><a href="../../typed_cache/TypedCache-class.html">TypedCache<span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends Object</span>&gt;</span></a></li>
+    <li class="self-crumb">get abstract method</li>
   </ol>
   <div class="self-name">get</div>
   <form class="search navbar-right" role="search">
@@ -49,14 +49,13 @@
     data-above-sidebar="typed_cache&#47;TypedCache-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">get&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends Object</span>&gt;</span> abstract method 
+<h1><span class="kind-method">get</span> abstract method 
 </h1></div>
 
     <section class="multi-line-signature">
       
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">D?</span>&gt;</span></span>
-<span class="name ">get</span>&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends Object</span>&gt;(<wbr><ol class="parameter-list"> <li><span class="parameter" id="get-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, {</span></li>
-<li><span class="parameter" id="get-param-codec"><span>required</span> <span class="type-annotation"><a href="../../typed_cache/CacheCodec-class.html">CacheCodec</a><span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D</span>&gt;</span></span> <span class="parameter-name">codec</span>, </span></li>
+<span class="name ">get</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="get-param-key"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, {</span></li>
 <li><span class="parameter" id="get-param-allowExpired"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowExpired</span> = <span class="default-value">false</span>, </span></li>
 </ol>})
 
@@ -69,7 +68,6 @@
 <p>Parameters:</p>
 <ul>
 <li><code>key</code>: The cache key</li>
-<li><code>codec</code>: The codec for decoding the value</li>
 <li><code>allowExpired</code>: If true, returns expired entries (useful for
 stale-while-revalidate patterns)</li>
 </ul>
@@ -82,11 +80,7 @@ is true). Throws <a href="../../typed_cache/CacheTypeMismatchException-class.htm
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;D?&gt; get&lt;E, D extends Object&gt;(
-  String key, {
-  required CacheCodec&lt;E, D&gt; codec,
-  bool allowExpired = false,
-});</code></pre>
+  <pre class="language-dart"><code class="language-dart">Future&lt;D?&gt; get(String key, {bool allowExpired = false});</code></pre>
 </section>
 
 
@@ -101,8 +95,8 @@ is true). Throws <a href="../../typed_cache/CacheTypeMismatchException-class.htm
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../../index.html">typed_cache</a></li>
     <li><a href="../../typed_cache/">typed_cache</a></li>
-    <li><a href="../../typed_cache/TypedCache-class.html">TypedCache</a></li>
-    <li class="self-crumb">get&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends Object</span>&gt; abstract method</li>
+    <li><a href="../../typed_cache/TypedCache-class.html">TypedCache<span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends Object</span>&gt;</span></a></li>
+    <li class="self-crumb">get abstract method</li>
 </ol>
 
     <h5>TypedCache class</h5>
@@ -114,7 +108,7 @@ is true). Throws <a href="../../typed_cache/CacheTypeMismatchException-class.htm
 <footer>
   <span class="no-break">
     typed_cache
-      0.1.0
+      0.2.0
   </span>
   
 </footer>
