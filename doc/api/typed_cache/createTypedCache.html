@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the createTypedCache function from the typed_cache library, for the Dart programming language.">
+  <title>createTypedCache function - typed_cache library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../static-assets/styles.css?v1">
+  <link rel="icon" href="../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../index.html">typed_cache</a></li>
+    <li><a href="../typed_cache/">typed_cache.dart</a></li>
+    <li class="self-crumb">createTypedCache function</li>
+  </ol>
+  <div class="self-name">createTypedCache</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+  <div
+      id="dartdoc-main-content"
+      class="main-content"
+      data-above-sidebar="typed_cache&#47;typed_cache-library-sidebar.html"
+      data-below-sidebar="">
+      <div>
+<h1><span class="kind-function">createTypedCache</span> function 
+ 
+</h1></div>
+
+    <section class="multi-line-signature">
+        
+<span class="returntype"><a href="../typed_cache/TypedCache-class.html">TypedCache</a></span>
+<span class="name ">createTypedCache</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="createTypedCache-param-backend"><span>required</span> <span class="type-annotation"><a href="../typed_cache/CacheBackend-class.html">CacheBackend</a></span> <span class="parameter-name">backend</span>, </span></li>
+<li><span class="parameter" id="createTypedCache-param-log"><span class="type-annotation"><a href="../typed_cache/CacheLogger.html">CacheLogger</a>?</span> <span class="parameter-name">log</span>, </span></li>
+<li><span class="parameter" id="createTypedCache-param-deleteCorruptedEntries"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">deleteCorruptedEntries</span> = <span class="default-value">true</span>, </span></li>
+</ol>})
+
+        
+
+    </section>
+    
+<section class="desc markdown">
+  <p>Creates a <a href="../typed_cache/TypedCache-class.html">TypedCache</a> instance with the given <code>backend</code>.</p>
+<p>Parameters:</p>
+<ul>
+<li><code>backend</code>: The storage backend (required)</li>
+<li><code>log</code>: Optional logger for debugging cache operations</li>
+<li><code>deleteCorruptedEntries</code>: If true, silently removes corrupted entries
+instead of throwing exceptions (default: true)</li>
+</ul>
+<p>Returns a fully configured <a href="../typed_cache/TypedCache-class.html">TypedCache</a> ready to use.</p>
+</section>
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">TypedCache createTypedCache({
+  required CacheBackend backend,
+  CacheLogger? log,
+  bool deleteCorruptedEntries = true,
+}) {
+  return CacheStore(backend: backend, logger: log, deleteCorruptedEntries: deleteCorruptedEntries);
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../index.html">typed_cache</a></li>
+    <li><a href="../typed_cache/">typed_cache</a></li>
+    <li class="self-crumb">createTypedCache function</li>
+</ol>
+
+    <h5>typed_cache library</h5>
+    <div id="dartdoc-sidebar-left-content"></div>
+  </div><!--/.sidebar-offcanvas-left-->
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+</main>
+<footer>
+  <span class="no-break">
+    typed_cache
+      0.1.0
+  </span>
+  
+</footer>
+
+
+<script src="../static-assets/highlight.pack.js?v1"></script>
+<script src="../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+

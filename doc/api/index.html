@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="typed_cache API docs, for the Dart programming language.">
+  <title>typed_cache - Dart API docs</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="static-assets/github.css?v1">
+  <link rel="stylesheet" href="static-assets/styles.css?v1">
+  <link rel="icon" href="static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li class="self-crumb">typed_cache package</li>
+  </ol>
+  <div class="self-name">typed_cache</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+  <div id="dartdoc-main-content" class="main-content">
+      
+<section class="desc markdown">
+  <h1 id="typed-cache">Typed Cache</h1>
+<p>Um pacote Dart de cache <strong>type-safe</strong> com suporte a políticas de retenção (TTL), múltiplos backends de armazenamento e codificação flexível.</p>
+<h2 id="features">Features</h2>
+<ul>
+<li>🔒 <strong>Type-safe:</strong> Cache com total suporte a tipos genéricos em Dart</li>
+<li>⏰ <strong>TTL Policies:</strong> Controle de tempo de vida dos itens em cache com política configurável</li>
+<li>🔌 <strong>Pluggable Backends:</strong> Suporte para múltiplos backends de armazenamento</li>
+<li>🔄 <strong>Flexible Encoding:</strong> Codecs customizáveis para serialização/desserialização</li>
+<li>🎯 <strong>Clean Architecture:</strong> Arquitetura modular e desacoplada</li>
+<li>📝 <strong>Type Entries:</strong> Entrada tipada com metadados e timestamps</li>
+</ul>
+<h2 id="getting-started">Getting started</h2>
+<h3 id="pr-requisitos">Pré-requisitos</h3>
+<pre class="language-yaml"><code class="language-yaml">environment:
+  sdk: ^3.10.4
+</code></pre>
+<h3 id="instalao">Instalação</h3>
+<p>Adicione <code>typed_cache</code> ao seu <code>pubspec.yaml</code>:</p>
+<pre class="language-bash"><code class="language-bash">flutter pub add typed_cache
+# ou
+dart pub add typed_cache
+</code></pre>
+<h2 id="usage">Usage</h2>
+<h3 id="criando-um-cache">Criando um Cache</h3>
+<pre class="language-dart"><code class="language-dart">import 'package:typed_cache/typed_cache.dart';
+
+// Criar um cache com TTL de 5 minutos
+final cache = TypedCache&lt;String, int&gt;(
+  backend: InMemoryBackend(),
+  policy: TtlPolicy(duration: Duration(minutes: 5)),
+);
+
+// Armazenar um valor
+await cache.set('counter', 42);
+
+// Recuperar um valor
+final value = await cache.get('counter');
+print(value); // 42
+
+// Remover um valor
+await cache.remove('counter');
+
+// Limpar todo o cache
+await cache.clear();
+</code></pre>
+<h3 id="usando-diferentes-backends">Usando Diferentes Backends</h3>
+<pre class="language-dart"><code class="language-dart">// Backend em memória (padrão)
+final memoryCache = TypedCache&lt;String, String&gt;(
+  backend: InMemoryBackend(),
+);
+
+// Backend customizado
+final customCache = TypedCache&lt;String, User&gt;(
+  backend: MyCustomBackend(),
+  codec: JsonCodec&lt;User&gt;(),
+);
+</code></pre>
+<h3 id="polticas-de-ttl">Políticas de TTL</h3>
+<pre class="language-dart"><code class="language-dart">// TTL fixo de 1 hora
+final ttlPolicy = TtlPolicy(duration: Duration(hours: 1));
+
+// Usar com clock customizado (útil para testes)
+final testPolicy = TtlPolicy(
+  duration: Duration(minutes: 5),
+  clock: FakeClock(),
+);
+</code></pre>
+<h2 id="arquitetura">Arquitetura</h2>
+<pre class="language-dart"><code>typed_cache/
+├── backend.dart       # Interface abstrata para backends
+├── cache_store.dart   # Armazenamento interno
+├── codec.dart         # Codificação/descodificação
+├── entry.dart         # Entrada tipada com metadados
+├── errors.dart        # Exceções customizadas
+├── typed_cache.dart   # API principal
+└── policy/
+    ├── clock.dart     # Interface de relógio (para testes)
+    └── ttl_policy.dart # Política de TTL
+</code></pre>
+<h2 id="contribuindo">Contribuindo</h2>
+<p>As contribuições são bem-vindas! Por favor:</p>
+<ol>
+<li>Faça um fork do repositório</li>
+<li>Crie uma branch para sua feature (<code>git checkout -b feature/amazing-feature</code>)</li>
+<li>Commit suas mudanças (<code>git commit -m 'Add amazing feature'</code>)</li>
+<li>Push para a branch (<code>git push origin feature/amazing-feature</code>)</li>
+<li>Abra um Pull Request</li>
+</ol>
+<h2 id="licena">Licença</h2>
+<p>Este projeto está sob a licença MIT. Veja o arquivo <code>LICENSE</code> para mais detalhes.</p>
+</section>
+
+
+      <section class="summary">
+          <h2>Libraries</h2>
+        <dl>
+          <dt id="typed_cache">
+  <span class="name"><a href="typed_cache/">typed_cache</a></span> 
+
+</dt>
+<dd>A type-safe, pluggable cache library for Dart with TTL policies and
+flexible encoding support.
+</dd>
+
+        </dl>
+      </section>
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li class="self-crumb">typed_cache package</li>
+</ol>
+
+    <h5 class="hidden-xs"><span class="package-name">typed_cache</span> <span class="package-kind">package</span></h5>
+    <ol>
+      <li class="section-title">Libraries</li>
+      <li><a href="typed_cache/">typed_cache</a></li>
+</ol>
+
+  </div>
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div>
+</main>
+<footer>
+  <span class="no-break">
+    typed_cache
+      0.1.0
+  </span>
+  
+</footer>
+
+
+<script src="static-assets/highlight.pack.js?v1"></script>
+<script src="static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+
