@@ -6,18 +6,41 @@ import 'policy/clock.dart';
 import 'policy/ttl_policy.dart';
 import 'typed_cache.dart';
 
+/// Signature for cache logging functions.
+///
+/// Called when cache operations succeed or fail. Useful for debugging
+/// and monitoring cache health.
 typedef CacheLogger = void Function(String message, Object? error, StackTrace? st);
 
+/// Production [TypedCache] implementation.
+///
+/// This class orchestrates the cache operations, delegating to:
+/// - [CacheBackend]: Persistent storage
+/// - [TtlPolicy]: Expiration logic
+/// - [Clock]: Time source
+///
+/// It handles:
+/// - Type validation via codec typeId
+/// - Lazy expiration (on access, not scheduled)
+/// - Corrupted entry cleanup
+/// - Error logging
 final class CacheStore implements TypedCache {
   final CacheBackend _backend;
   final Clock _clock;
   final TtlPolicy _ttlPolicy;
   final CacheLogger? _log;
 
-  /// If true: on decode/type mismatch, delete entry and return null.
-  /// If false: throw.
+  /// If true, silently delete corrupted/mismatched entries instead of throwing.
   final bool deleteCorruptedEntries;
 
+  /// Creates a new cache instance.
+  ///
+  /// Parameters:
+  /// - [backend]: Required storage backend
+  /// - [clock]: Time source (default: [SystemClock])
+  /// - [ttlPolicy]: TTL computation strategy (default: [DefaultTtlPolicy])
+  /// - [logger]: Optional logging function
+  /// - [deleteCorruptedEntries]: Auto-delete corrupted entries (default: true)
   CacheStore({
     required CacheBackend backend,
     Clock clock = const SystemClock(),
@@ -72,7 +95,9 @@ final class CacheStore implements TypedCache {
     }
 
     if (entry.typeId != codec.typeId) {
-      final msg = 'Type mismatch for key="$key": stored="${entry.typeId}" requested="${codec.typeId}"';
+      final msg =
+          'Type mismatch for key="$key": '
+          'stored="${entry.typeId}" requested="${codec.typeId}"';
       if (deleteCorruptedEntries) {
         _log?.call(msg, null, null);
         try {
@@ -116,8 +141,8 @@ final class CacheStore implements TypedCache {
     if (cached != null && !allowExpiredWhileRevalidating) return cached;
 
     if (cached != null && allowExpiredWhileRevalidating) {
-      // Fire-and-forget refresh, but we can't do real background tasks here.
-      // We return cached and refresh in the same async chain (best effort).
+      // Return stale but revalidate in the background.
+      // Note: This is best-effort; errors are logged but not propagated.
       try {
         final fresh = await fetch();
         await put<E, D>(key, fresh, codec: codec, ttl: ttl, tags: tags);
@@ -138,7 +163,7 @@ final class CacheStore implements TypedCache {
   @override
   Future<void> invalidateByTag(String tag) async {
     final keys = await _backend.keysByTag(tag);
-    // Best effort delete all.
+    // Best-effort delete all keys with this tag.
     for (final k in keys) {
       try {
         await _backend.delete(k);
@@ -146,11 +171,11 @@ final class CacheStore implements TypedCache {
         _log?.call('Failed to delete key="$k" from tag="$tag"', e, st);
       }
     }
-    // Also remove tag mapping if backend keeps a separate index.
+    // Also remove the tag index if the backend supports it.
     try {
       await _backend.deleteTag(tag);
     } catch (_) {
-      // Optional: backend may not support.
+      // Silently ignore: backend may not support tag deletion.
     }
   }
 
@@ -188,10 +213,7 @@ final class CacheStore implements TypedCache {
     try {
       await _backend.write<E>(entry);
     } catch (e, st) {
-      throw CacheBackendException(
-        'Backend write failed for key="$key": $e'
-        '\n${st.toString()}',
-      );
+      throw CacheBackendException('Backend write failed for key="$key": $e\n${st.toString()}');
     }
   }
 
