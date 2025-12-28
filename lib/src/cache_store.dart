@@ -57,7 +57,6 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
 
   @override
   Future<void> clear() => _backend.clear();
-
   @override
   Future<bool> contains(String key) async {
     final entry = await _backend.read(key);
@@ -73,57 +72,30 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
   Future<D?> get(String key, {bool allowExpired = false}) async {
     final now = _clock.nowEpochMs();
     CacheEntry<E>? entry;
-    final codec = defaultCodec;
     try {
       entry = await _backend.read<E>(key);
     } catch (e, st) {
       _log?.call('Backend read failed for key="$key"', e, st);
       throw CacheBackendException('Backend read failed for key="$key": $e');
     }
+    return await _makeData(entry, allowExpired, now, key);
+  }
 
-    if (entry == null) return null;
-
-    if (!allowExpired && entry.isExpired(now)) {
-      // Lazy expiration cleanup.
-      try {
-        await _backend.delete(key);
-      } catch (e, st) {
-        _log?.call('Failed to delete expired key="$key"', e, st);
-      }
+  @override
+  Future<List<D>?> getAll() async {
+    final listAll = await _backend.readAll<E>();
+    if (listAll.isEmpty) {
       return null;
     }
-
-    if (entry.typeId != codec.typeId) {
-      final msg =
-          'Type mismatch for key="$key": '
-          'stored="${entry.typeId}" requested="${codec.typeId}"';
-      if (deleteCorruptedEntries) {
-        _log?.call(msg, null, null);
-        try {
-          await _backend.delete(key);
-        } catch (e, st) {
-          _log?.call('Failed to delete mismatched key="$key"', e, st);
-        }
-        return null;
+    final listFutures = <D>[];
+    for (final entry in listAll) {
+      final data = await _makeData(entry, false, _clock.nowEpochMs(), entry.key);
+      if (data != null) {
+        listFutures.add(data);
       }
-      throw CacheTypeMismatchException(msg);
     }
 
-    try {
-      return codec.decode(entry.payload);
-    } catch (e, st) {
-      final msg = 'Decode failed for key="$key" typeId="${codec.typeId}"';
-      if (deleteCorruptedEntries) {
-        _log?.call(msg, e, st);
-        try {
-          await _backend.delete(key);
-        } catch (e2, st2) {
-          _log?.call('Failed to delete corrupted key="$key"', e2, st2);
-        }
-        return null;
-      }
-      throw CacheDecodeException(msg, cause: e, stackTrace: st);
-    }
+    return listFutures;
   }
 
   @override
@@ -212,5 +184,52 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
   @override
   Future<void> remove(String key) async {
     await _backend.delete(key);
+  }
+
+  Future<D?> _makeData(CacheEntry<E>? entry, bool allowExpired, int now, String key) async {
+    final codec = defaultCodec;
+    if (entry == null) return null;
+
+    if (!allowExpired && entry.isExpired(now)) {
+      // Lazy expiration cleanup.
+      try {
+        await _backend.delete(key);
+      } catch (e, st) {
+        _log?.call('Failed to delete expired key="$key"', e, st);
+      }
+      return null;
+    }
+
+    if (entry.typeId != codec.typeId) {
+      final msg =
+          'Type mismatch for key="$key": '
+          'stored="${entry.typeId}" requested="${codec.typeId}"';
+      if (deleteCorruptedEntries) {
+        _log?.call(msg, null, null);
+        try {
+          await _backend.delete(key);
+        } catch (e, st) {
+          _log?.call('Failed to delete mismatched key="$key"', e, st);
+        }
+        return null;
+      }
+      throw CacheTypeMismatchException(msg);
+    }
+
+    try {
+      return codec.decode(entry.payload);
+    } catch (e, st) {
+      final msg = 'Decode failed for key="$key" typeId="${codec.typeId}"';
+      if (deleteCorruptedEntries) {
+        _log?.call(msg, e, st);
+        try {
+          await _backend.delete(key);
+        } catch (e2, st2) {
+          _log?.call('Failed to delete corrupted key="$key"', e2, st2);
+        }
+        return null;
+      }
+      throw CacheDecodeException(msg, cause: e, stackTrace: st);
+    }
   }
 }

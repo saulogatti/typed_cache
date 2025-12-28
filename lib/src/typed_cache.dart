@@ -48,7 +48,6 @@ abstract interface class TypedCache<E, D extends Object> {
   ///
   /// Parameters:
   /// - [key]: The cache key
-  /// - [codec]: The codec for decoding the value
   /// - [allowExpired]: If true, returns expired entries (useful for
   ///   stale-while-revalidate patterns)
   ///
@@ -56,6 +55,8 @@ abstract interface class TypedCache<E, D extends Object> {
   /// is true). Throws [CacheTypeMismatchException] or
   /// [CacheDecodeException] if the stored type doesn't match.
   Future<D?> get(String key, {bool allowExpired = false});
+
+  Future<List<D>?> getAll();
 
   /// Gets a value from cache or fetches it if missing/expired.
   ///
@@ -66,7 +67,6 @@ abstract interface class TypedCache<E, D extends Object> {
   ///
   /// Parameters:
   /// - [key]: The cache key
-  /// - [codec]: The codec for encoding/decoding
   /// - [fetch]: Function that returns fresh data
   /// - [ttl]: Optional time-to-live for cached value
   /// - [tags]: Optional tags for grouped invalidation
@@ -107,7 +107,6 @@ abstract interface class TypedCache<E, D extends Object> {
   /// Parameters:
   /// - [key]: The cache key
   /// - [value]: The value to cache
-  /// - [codec]: The codec for encoding the value
   /// - [ttl]: Optional time-to-live (null = no expiration)
   /// - [tags]: Optional tags for grouped invalidation
   ///

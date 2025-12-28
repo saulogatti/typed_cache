@@ -468,6 +468,10 @@ class FailingCacheBackend implements CacheBackend {
 
   @override
   Future<CacheEntry<E>?> read<E>(String key) async => throw CacheBackendException('Backend error');
+  @override
+  Future<List<CacheEntry<E>>> readAll<E>() {
+    throw CacheBackendException('Backend error');
+  }
 
   @override
   Future<void> write<E>(CacheEntry<E> entry) async => throw CacheBackendException('Backend error');
@@ -534,6 +538,11 @@ class FakeCacheBackend implements CacheBackend {
   @override
   Future<CacheEntry<E>?> read<E>(String key) async {
     return _storage[key] as CacheEntry<E>?;
+  }
+
+  @override
+  Future<List<CacheEntry<E>>> readAll<E>() async {
+    return _storage.values.whereType<CacheEntry<E>>().toList();
   }
 
   @override
