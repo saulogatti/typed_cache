@@ -23,7 +23,7 @@ abstract interface class CacheCodec<E, D> {
   /// Stable identifier for this codec's type and schema version.
   ///
   /// This is stored with the cache entry to detect type mismatches.
-  /// Examples: 'user:v1', 'product:v2', 'List<int>:v1'
+  /// Examples: 'user:v1', 'product:v2', 'List:v1'
   ///
   /// **Important:** Never change a typeId for existing entries; instead,
   /// increment the version (e.g., 'user:v2'). This prevents silent

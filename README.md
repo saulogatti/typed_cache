@@ -1,115 +1,115 @@
 # Typed Cache
 
-Um pacote Dart de cache **type-safe** com suporte a políticas de retenção (TTL), múltiplos backends de armazenamento e codificação flexível.
+A **type-safe** Dart caching package with support for retention policies (TTL), multiple storage backends, and flexible encoding.
 
 ## Features
 
-- 🔒 **Type-safe:** Cache com total suporte a tipos genéricos em Dart
-- ⏰ **TTL Policies:** Controle de tempo de vida dos itens em cache com política configurável
-- 🔌 **Pluggable Backends:** Suporte para múltiplos backends de armazenamento
-- 🔄 **Flexible Encoding:** Codecs customizáveis para serialização/desserialização
-- 🎯 **Clean Architecture:** Arquitetura modular e desacoplada
-- 📝 **Type Entries:** Entrada tipada com metadados e timestamps
+- 🔒 **Type-safe:** Fully type-safe cache with generic type support in Dart
+- ⏰ **TTL Policies:** Cache item lifetime control with configurable policies
+- 🔌 **Pluggable Backends:** Support for multiple storage backends
+- 🔄 **Flexible Encoding:** Customizable codecs for serialization/deserialization
+- 🎯 **Clean Architecture:** Modular and decoupled architecture
+- 📝 **Type Entries:** Typed entries with metadata and timestamps
 
 ## Getting started
 
-### Pré-requisitos
+### Prerequisites
 
 ```yaml
 environment:
   sdk: ^3.10.4
 ```
 
-### Instalação
+### Installation
 
-Adicione `typed_cache` ao seu `pubspec.yaml`:
+Add `typed_cache` to your `pubspec.yaml`:
 
 ```bash
 flutter pub add typed_cache
-# ou
+# or
 dart pub add typed_cache
 ```
 
 ## Usage
 
-### Criando um Cache
+### Creating a Cache
 
 ```dart
 import 'package:typed_cache/typed_cache.dart';
 
-// Criar um cache com TTL de 5 minutos
+// Create a cache with 5 minutes TTL
 final cache = TypedCache<String, int>(
   backend: InMemoryBackend(),
   policy: TtlPolicy(duration: Duration(minutes: 5)),
 );
 
-// Armazenar um valor
+// Store a value
 await cache.set('counter', 42);
 
-// Recuperar um valor
+// Retrieve a value
 final value = await cache.get('counter');
 print(value); // 42
 
-// Remover um valor
+// Remove a value
 await cache.remove('counter');
 
-// Limpar todo o cache
+// Clear the entire cache
 await cache.clear();
 ```
 
-### Usando Diferentes Backends
+### Using Different Backends
 
 ```dart
-// Backend em memória (padrão)
+// In-memory backend (default)
 final memoryCache = TypedCache<String, String>(
   backend: InMemoryBackend(),
 );
 
-// Backend customizado
+// Custom backend
 final customCache = TypedCache<String, User>(
   backend: MyCustomBackend(),
   codec: JsonCodec<User>(),
 );
 ```
 
-### Políticas de TTL
+### TTL Policies
 
 ```dart
-// TTL fixo de 1 hora
+// Fixed TTL of 1 hour
 final ttlPolicy = TtlPolicy(duration: Duration(hours: 1));
 
-// Usar com clock customizado (útil para testes)
+// Custom clock (useful for testing)
 final testPolicy = TtlPolicy(
   duration: Duration(minutes: 5),
   clock: FakeClock(),
 );
 ```
 
-## Arquitetura
+## Architecture
 
 ```
 typed_cache/
-├── backend.dart       # Interface abstrata para backends
-├── cache_store.dart   # Armazenamento interno
-├── codec.dart         # Codificação/descodificação
-├── entry.dart         # Entrada tipada com metadados
-├── errors.dart        # Exceções customizadas
-├── typed_cache.dart   # API principal
+├── backend.dart       # Abstract interface for backends
+├── cache_store.dart   # Internal storage
+├── codec.dart         # Encoding/decoding
+├── entry.dart         # Typed entry with metadata
+├── errors.dart        # Custom exceptions
+├── typed_cache.dart   # Main API
 └── policy/
-    ├── clock.dart     # Interface de relógio (para testes)
-    └── ttl_policy.dart # Política de TTL
+    ├── clock.dart     # Clock interface (for testing)
+    └── ttl_policy.dart # TTL policy
 ```
 
-## Contribuindo
+## Contributing
 
-As contribuições são bem-vindas! Por favor:
+Contributions are welcome! Please:
 
-1. Faça um fork do repositório
-2. Crie uma branch para sua feature (`git checkout -b feature/amazing-feature`)
-3. Commit suas mudanças (`git commit -m 'Add amazing feature'`)
-4. Push para a branch (`git push origin feature/amazing-feature`)
-5. Abra um Pull Request
+1.  Fork the repository
+2. Create a branch for your feature (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## Licença
+## License
 
-Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+This project is licensed under the MIT License. See the `LICENSE` file for more details.
