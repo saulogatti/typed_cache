@@ -1,4 +1,13 @@
-import 'codec.dart';
+import 'package:typed_cache/src/cache_store.dart';
+import 'package:typed_cache/typed_cache.dart';
+
+TypedCache createTypedCache({
+  required CacheBackend backend,
+  CacheLogger? log,
+  bool deleteCorruptedEntries = true,
+}) {
+  return CacheStore(backend: backend, logger: log, deleteCorruptedEntries: deleteCorruptedEntries);
+}
 
 abstract interface class TypedCache {
   Future<void> clear();
