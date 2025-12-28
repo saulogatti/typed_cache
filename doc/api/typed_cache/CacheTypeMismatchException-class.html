@@ -58,7 +58,7 @@
   <p>Thrown when retrieving an entry with a mismatched type.</p>
 <p>This happens when the codec's typeId doesn't match the stored type,
 indicating a schema change or wrong codec usage. If the cache is
-configured with <code>deleteCorruptedEntries</code>, this exception is caught
+configured with <code>CacheStore.deleteCorruptedEntries</code>, this exception is caught
 internally and the entry is deleted.</p>
 </section>
 
