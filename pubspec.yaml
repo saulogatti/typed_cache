@@ -1,14 +1,11 @@
 name: typed_cache
 description: A starting point for Dart libraries or applications.
 version: 0.1.0
-# repository: https://github.com/my_org/my_repo
-publish_to: none # Remove this line if you wish to publish to pub.dev
+repository: https://github.com/saulogatti/typed_cache.git
 environment:
   sdk: ^3.10.4
 
-# Add regular dependencies here.
 dependencies:
-  # json_annotation: ^4.9.0
   meta: ^1.10.0
 dev_dependencies:
   lints: ^6.0.0

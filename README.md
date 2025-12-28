@@ -1,39 +1,115 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# Typed Cache
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages). 
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages). 
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+Um pacote Dart de cache **type-safe** com suporte a políticas de retenção (TTL), múltiplos backends de armazenamento e codificação flexível.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+- 🔒 **Type-safe:** Cache com total suporte a tipos genéricos em Dart
+- ⏰ **TTL Policies:** Controle de tempo de vida dos itens em cache com política configurável
+- 🔌 **Pluggable Backends:** Suporte para múltiplos backends de armazenamento
+- 🔄 **Flexible Encoding:** Codecs customizáveis para serialização/desserialização
+- 🎯 **Clean Architecture:** Arquitetura modular e desacoplada
+- 📝 **Type Entries:** Entrada tipada com metadados e timestamps
 
 ## Getting started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+### Pré-requisitos
+
+```yaml
+environment:
+  sdk: ^3.10.4
+```
+
+### Instalação
+
+Adicione `typed_cache` ao seu `pubspec.yaml`:
+
+```bash
+flutter pub add typed_cache
+# ou
+dart pub add typed_cache
+```
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+### Criando um Cache
 
 ```dart
-const like = 'sample';
+import 'package:typed_cache/typed_cache.dart';
+
+// Criar um cache com TTL de 5 minutos
+final cache = TypedCache<String, int>(
+  backend: InMemoryBackend(),
+  policy: TtlPolicy(duration: Duration(minutes: 5)),
+);
+
+// Armazenar um valor
+await cache.set('counter', 42);
+
+// Recuperar um valor
+final value = await cache.get('counter');
+print(value); // 42
+
+// Remover um valor
+await cache.remove('counter');
+
+// Limpar todo o cache
+await cache.clear();
 ```
 
-## Additional information
+### Usando Diferentes Backends
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+```dart
+// Backend em memória (padrão)
+final memoryCache = TypedCache<String, String>(
+  backend: InMemoryBackend(),
+);
+
+// Backend customizado
+final customCache = TypedCache<String, User>(
+  backend: MyCustomBackend(),
+  codec: JsonCodec<User>(),
+);
+```
+
+### Políticas de TTL
+
+```dart
+// TTL fixo de 1 hora
+final ttlPolicy = TtlPolicy(duration: Duration(hours: 1));
+
+// Usar com clock customizado (útil para testes)
+final testPolicy = TtlPolicy(
+  duration: Duration(minutes: 5),
+  clock: FakeClock(),
+);
+```
+
+## Arquitetura
+
+```
+typed_cache/
+├── backend.dart       # Interface abstrata para backends
+├── cache_store.dart   # Armazenamento interno
+├── codec.dart         # Codificação/descodificação
+├── entry.dart         # Entrada tipada com metadados
+├── errors.dart        # Exceções customizadas
+├── typed_cache.dart   # API principal
+└── policy/
+    ├── clock.dart     # Interface de relógio (para testes)
+    └── ttl_policy.dart # Política de TTL
+```
+
+## Contribuindo
+
+As contribuições são bem-vindas! Por favor:
+
+1. Faça um fork do repositório
+2. Crie uma branch para sua feature (`git checkout -b feature/amazing-feature`)
+3. Commit suas mudanças (`git commit -m 'Add amazing feature'`)
+4. Push para a branch (`git push origin feature/amazing-feature`)
+5. Abra um Pull Request
+
+## Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
