@@ -12,26 +12,39 @@ import 'package:typed_cache/typed_cache.dart';
 
 void main() {
   group('CacheStore', () {
-    late CacheStore cache;
+    late CacheStore cache, cacheInt;
     late FakeCacheBackend backend;
     late FakeClock clock;
+    final codec = StringCodec();
+    final intCodec = IntCodec();
 
     setUp(() {
       backend = FakeCacheBackend();
       clock = FakeClock();
-      cache = CacheStore(backend: backend, clock: clock, ttlPolicy: const DefaultTtlPolicy());
+      cache = CacheStore(
+        backend: backend,
+        defaultCodec: codec,
+        clock: clock,
+        ttlPolicy: const DefaultTtlPolicy(),
+      );
+      cacheInt = CacheStore(
+        backend: backend,
+        defaultCodec: intCodec,
+        clock: clock,
+        ttlPolicy: const DefaultTtlPolicy(),
+      );
     });
 
     group('put and get', () {
       test('stores and retrieves a value', () async {
         // Arrange
-        final codec = StringCodec();
+
         const key = 'user:123';
         const value = 'Alice';
 
         // Act
-        await cache.put(key, value, codec: codec);
-        final retrieved = await cache.get(key, codec: codec);
+        await cache.put(key, value);
+        final retrieved = await cache.get(key);
 
         // Assert
         expect(retrieved, equals(value));
@@ -39,7 +52,7 @@ void main() {
 
       test('returns null for non-existent key', () async {
         // Arrange & Act
-        final retrieved = await cache.get('nonexistent', codec: StringCodec());
+        final retrieved = await cache.get('nonexistent');
 
         // Assert
         expect(retrieved, isNull);
@@ -47,30 +60,28 @@ void main() {
 
       test('stores multiple values independently', () async {
         // Arrange
-        final strCodec = StringCodec();
-        final intCodec = IntCodec();
 
         // Act
-        await cache.put('str', 'hello', codec: strCodec);
-        await cache.put('int', 42, codec: intCodec);
+        await cache.put('str', 'hello');
+        await cacheInt.put('int', 42);
 
         // Assert
-        expect(await cache.get('str', codec: strCodec), equals('hello'));
-        expect(await cache.get('int', codec: intCodec), equals(42));
+        expect(await cache.get('str'), equals('hello'));
+        expect(await cacheInt.get('int'), equals(42));
       });
     });
 
     group('TTL and expiration', () {
       test('returns null for expired entries', () async {
         // Arrange
-        final codec = StringCodec();
+
         const key = 'temp';
         const ttl = Duration(minutes: 1);
 
         // Act
-        await cache.put(key, 'value', codec: codec, ttl: ttl);
+        await cache.put(key, 'value', ttl: ttl);
         clock.advance(Duration(minutes: 2));
-        final retrieved = await cache.get(key, codec: codec);
+        final retrieved = await cache.get(key);
 
         // Assert
         expect(retrieved, isNull);
@@ -78,14 +89,14 @@ void main() {
 
       test('returns non-expired values', () async {
         // Arrange
-        final codec = StringCodec();
+
         const key = 'temp';
         const ttl = Duration(minutes: 5);
 
         // Act
-        await cache.put(key, 'value', codec: codec, ttl: ttl);
+        await cache.put(key, 'value', ttl: ttl);
         clock.advance(Duration(minutes: 2));
-        final retrieved = await cache.get(key, codec: codec);
+        final retrieved = await cache.get(key);
 
         // Assert
         expect(retrieved, equals('value'));
@@ -93,14 +104,14 @@ void main() {
 
       test('allowExpired returns expired entries', () async {
         // Arrange
-        final codec = StringCodec();
+
         const key = 'stale';
         const ttl = Duration(minutes: 1);
 
         // Act
-        await cache.put(key, 'stale-value', codec: codec, ttl: ttl);
+        await cache.put(key, 'stale-value', ttl: ttl);
         clock.advance(Duration(minutes: 2));
-        final retrieved = await cache.get(key, codec: codec, allowExpired: true);
+        final retrieved = await cache.get(key, allowExpired: true);
 
         // Assert
         expect(retrieved, equals('stale-value'));
@@ -108,10 +119,10 @@ void main() {
 
       test('purgeExpired removes expired entries', () async {
         // Arrange
-        final codec = StringCodec();
-        await cache.put('key1', 'value1', codec: codec, ttl: Duration(seconds: 30));
+
+        await cache.put('key1', 'value1', ttl: Duration(seconds: 30));
         clock.advance(Duration(seconds: 60));
-        await cache.put('key2', 'value2', codec: codec, ttl: Duration(hours: 1));
+        await cache.put('key2', 'value2', ttl: Duration(hours: 1));
 
         // Act
         final purged = await cache.purgeExpired();
@@ -126,8 +137,8 @@ void main() {
     group('contains', () {
       test('returns true for existing non-expired entries', () async {
         // Arrange
-        final codec = StringCodec();
-        await cache.put('key', 'value', codec: codec);
+
+        await cache.put('key', 'value');
 
         // Act & Assert
         expect(await cache.contains('key'), isTrue);
@@ -140,8 +151,8 @@ void main() {
 
       test('returns false for expired entries', () async {
         // Arrange
-        final codec = StringCodec();
-        await cache.put('key', 'value', codec: codec, ttl: Duration(seconds: 10));
+
+        await cache.put('key', 'value', ttl: Duration(seconds: 10));
         clock.advance(Duration(seconds: 20));
 
         // Act & Assert
@@ -152,11 +163,11 @@ void main() {
     group('type validation', () {
       test('validates codec typeId and accepts matching types', () async {
         // Arrange
-        final codec = StringCodec();
-        await cache.put('key', 'value', codec: codec);
+
+        await cache.put('key', 'value');
 
         // Act
-        final retrieved = await cache.get('key', codec: codec);
+        final retrieved = await cache.get('key');
 
         // Assert
         expect(retrieved, equals('value'));
@@ -164,18 +175,17 @@ void main() {
 
       test('stores and retrieves with correct codec typeId', () async {
         // Arrange
-        final strCodec = StringCodec();
-        final intCodec = IntCodec();
+
         const strKey = 'str_key';
         const intKey = 'int_key';
 
         // Act
-        await cache.put(strKey, 'hello', codec: strCodec);
-        await cache.put(intKey, 42, codec: intCodec);
+        await cache.put(strKey, 'hello');
+        await cacheInt.put(intKey, 42);
 
         // Assert
-        expect(await cache.get(strKey, codec: strCodec), equals('hello'));
-        expect(await cache.get(intKey, codec: intCodec), equals(42));
+        expect(await cache.get(strKey), equals('hello'));
+        expect(await cacheInt.get(intKey), equals(42));
       });
     });
 
@@ -183,10 +193,16 @@ void main() {
       test('silently deletes on decode failure with deleteCorruptedEntries=true', () async {
         // Arrange
         final codec = FailingDecodeCodec();
-        await cache.put('key', 'value', codec: codec);
+        final cache = CacheStore(
+          backend: backend,
+          clock: clock,
+          deleteCorruptedEntries: true,
+          defaultCodec: codec,
+        );
+        await cache.put('key', 'value');
 
         // Act
-        final retrieved = await cache.get('key', codec: codec);
+        final retrieved = await cache.get('key');
 
         // Assert - returns null due to decode error and deleteCorruptedEntries
         expect(retrieved, isNull);
@@ -194,24 +210,29 @@ void main() {
       });
 
       test('throws on decode failure with deleteCorruptedEntries=false', () async {
-        // Arrange
-        cache = CacheStore(backend: backend, clock: clock, deleteCorruptedEntries: false);
         final codec = FailingDecodeCodec();
-        await cache.put('key', 'value', codec: codec);
+        cache = CacheStore(
+          backend: backend,
+          clock: clock,
+          deleteCorruptedEntries: false,
+          defaultCodec: codec,
+        );
+
+        await cache.put('key', 'value');
 
         // Act & Assert
-        expect(() => cache.get('key', codec: codec), throwsA(isA<CacheDecodeException>()));
+        expect(() => cache.get('key'), throwsA(isA<CacheDecodeException>()));
       });
     });
 
     group('tags and invalidation', () {
       test('stores entries with tags', () async {
         // Arrange
-        final codec = StringCodec();
+
         const tags = {'user', 'session'};
 
         // Act
-        await cache.put('key', 'value', codec: codec, tags: tags);
+        await cache.put('key', 'value', tags: tags);
 
         // Assert
         expect((await backend.read('key'))?.tags, equals(tags));
@@ -219,10 +240,10 @@ void main() {
 
       test('invalidateByTag removes all entries with tag', () async {
         // Arrange
-        final codec = StringCodec();
-        await cache.put('user:1', 'alice', codec: codec, tags: {'user'});
-        await cache.put('user:2', 'bob', codec: codec, tags: {'user'});
-        await cache.put('post:1', 'hello', codec: codec, tags: {'post'});
+
+        await cache.put('user:1', 'alice', tags: {'user'});
+        await cache.put('user:2', 'bob', tags: {'user'});
+        await cache.put('post:1', 'hello', tags: {'post'});
 
         // Act
         await cache.invalidateByTag('user');
@@ -235,9 +256,9 @@ void main() {
 
       test('invalidate removes single entry', () async {
         // Arrange
-        final codec = StringCodec();
-        await cache.put('key1', 'value1', codec: codec);
-        await cache.put('key2', 'value2', codec: codec);
+
+        await cache.put('key1', 'value1');
+        await cache.put('key2', 'value2');
 
         // Act
         await cache.invalidate('key1');
@@ -251,14 +272,14 @@ void main() {
     group('getOrFetch', () {
       test('returns cached value if exists', () async {
         // Arrange
-        final codec = StringCodec();
-        await cache.put('key', 'cached', codec: codec);
+
+        await cache.put('key', 'cached');
         var fetchCalled = false;
 
         // Act
         final result = await cache.getOrFetch(
           'key',
-          codec: codec,
+
           fetch: () async {
             fetchCalled = true;
             return 'fresh';
@@ -272,24 +293,24 @@ void main() {
 
       test('fetches and stores if not cached', () async {
         // Arrange
-        final codec = StringCodec();
+
         const ttl = Duration(hours: 1);
 
         // Act
-        final result = await cache.getOrFetch('key', codec: codec, fetch: () async => 'fresh', ttl: ttl);
+        final result = await cache.getOrFetch('key', fetch: () async => 'fresh', ttl: ttl);
 
         // Assert
         expect(result, equals('fresh'));
-        expect(await cache.get('key', codec: codec), equals('fresh'));
+        expect(await cache.get('key'), equals('fresh'));
       });
 
       test('fetches and stores tags', () async {
         // Arrange
-        final codec = StringCodec();
+
         const tags = {'tag1', 'tag2'};
 
         // Act
-        await cache.getOrFetch('key', codec: codec, fetch: () async => 'value', tags: tags);
+        await cache.getOrFetch('key', fetch: () async => 'value', tags: tags);
 
         // Assert
         expect((await backend.read('key'))?.tags, equals(tags));
@@ -297,11 +318,10 @@ void main() {
 
       test('handles fetch errors', () async {
         // Arrange
-        final codec = StringCodec();
 
         // Act & Assert
         expect(
-          () => cache.getOrFetch('key', codec: codec, fetch: () async => throw Exception('Network error')),
+          () => cache.getOrFetch('key', fetch: () async => throw Exception('Network error')),
           throwsA(isA<Exception>()),
         );
       });
@@ -310,9 +330,9 @@ void main() {
     group('clear', () {
       test('removes all entries', () async {
         // Arrange
-        final codec = StringCodec();
-        await cache.put('key1', 'value1', codec: codec);
-        await cache.put('key2', 'value2', codec: codec);
+
+        await cache.put('key1', 'value1');
+        await cache.put('key2', 'value2');
 
         // Act
         await cache.clear();
@@ -326,18 +346,18 @@ void main() {
     group('backend errors', () {
       test('throws CacheBackendException on write failure', () async {
         // Arrange
-        cache = CacheStore(backend: FailingCacheBackend(), clock: clock);
+        cache = CacheStore(backend: FailingCacheBackend(), clock: clock, defaultCodec: StringCodec());
 
         // Act & Assert
-        expect(() => cache.put('key', 'value', codec: StringCodec()), throwsA(isA<CacheBackendException>()));
+        expect(() => cache.put('key', 'value'), throwsA(isA<CacheBackendException>()));
       });
 
       test('throws CacheBackendException on read failure', () async {
         // Arrange
-        cache = CacheStore(backend: FailingCacheBackend(), clock: clock);
+        cache = CacheStore(backend: FailingCacheBackend(), clock: clock, defaultCodec: StringCodec());
 
         // Act & Assert
-        expect(() => cache.get('key', codec: StringCodec()), throwsA(isA<CacheBackendException>()));
+        expect(() => cache.get('key'), throwsA(isA<CacheBackendException>()));
       });
     });
   });

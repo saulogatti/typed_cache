@@ -24,11 +24,13 @@ typedef CacheLogger = void Function(String message, Object? error, StackTrace? s
 /// - Lazy expiration (on access, not scheduled)
 /// - Corrupted entry cleanup
 /// - Error logging
-final class CacheStore implements TypedCache {
+final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
   final CacheBackend _backend;
   final Clock _clock;
   final TtlPolicy _ttlPolicy;
   final CacheLogger? _log;
+  @override
+  final CacheCodec<E, D> defaultCodec;
 
   /// If true, silently delete corrupted/mismatched entries instead of throwing.
   final bool deleteCorruptedEntries;
@@ -43,6 +45,7 @@ final class CacheStore implements TypedCache {
   /// - [deleteCorruptedEntries]: Auto-delete corrupted entries (default: true)
   CacheStore({
     required CacheBackend backend,
+    required this.defaultCodec,
     Clock clock = const SystemClock(),
     TtlPolicy ttlPolicy = const DefaultTtlPolicy(),
     CacheLogger? logger,
@@ -67,14 +70,10 @@ final class CacheStore implements TypedCache {
   }
 
   @override
-  Future<D?> get<E, D extends Object>(
-    String key, {
-    required CacheCodec<E, D> codec,
-    bool allowExpired = false,
-  }) async {
+  Future<D?> get(String key, {bool allowExpired = false}) async {
     final now = _clock.nowEpochMs();
     CacheEntry<E>? entry;
-
+    final codec = defaultCodec;
     try {
       entry = await _backend.read<E>(key);
     } catch (e, st) {
@@ -128,15 +127,14 @@ final class CacheStore implements TypedCache {
   }
 
   @override
-  Future<D> getOrFetch<E, D extends Object>(
+  Future<D> getOrFetch(
     String key, {
-    required CacheCodec<E, D> codec,
     required Future<D> Function() fetch,
     Duration? ttl,
     Set<String> tags = const {},
     bool allowExpiredWhileRevalidating = false,
   }) async {
-    final cached = await get<E, D>(key, codec: codec, allowExpired: allowExpiredWhileRevalidating);
+    final cached = await get(key, allowExpired: allowExpiredWhileRevalidating);
 
     if (cached != null && !allowExpiredWhileRevalidating) return cached;
 
@@ -145,7 +143,7 @@ final class CacheStore implements TypedCache {
       // Note: This is best-effort; errors are logged but not propagated.
       try {
         final fresh = await fetch();
-        await put<E, D>(key, fresh, codec: codec, ttl: ttl, tags: tags);
+        await put(key, fresh, ttl: ttl, tags: tags);
       } catch (e, st) {
         _log?.call('SWR refresh failed for key="$key"', e, st);
       }
@@ -153,7 +151,7 @@ final class CacheStore implements TypedCache {
     }
 
     final fresh = await fetch();
-    await put<E, D>(key, fresh, codec: codec, ttl: ttl, tags: tags);
+    await put(key, fresh, ttl: ttl, tags: tags);
     return fresh;
   }
 
@@ -191,16 +189,10 @@ final class CacheStore implements TypedCache {
   }
 
   @override
-  Future<void> put<E, D extends Object>(
-    String key,
-    D value, {
-    required CacheCodec<E, D> codec,
-    Duration? ttl,
-    Set<String> tags = const {},
-  }) async {
+  Future<void> put(String key, D value, {Duration? ttl, Set<String> tags = const {}}) async {
     final now = _clock.nowEpochMs();
     final expiresAt = _ttlPolicy.computeExpiresAtEpochMs(ttl: ttl, clock: _clock);
-
+    final codec = defaultCodec;
     final entry = CacheEntry<E>(
       key: key,
       typeId: codec.typeId,

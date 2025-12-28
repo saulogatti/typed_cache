@@ -12,12 +12,18 @@ export 'package:typed_cache/src/cache_store.dart' show CacheLogger;
 ///   instead of throwing exceptions (default: true)
 ///
 /// Returns a fully configured [TypedCache] ready to use.
-TypedCache createTypedCache({
+TypedCache<E, D> createTypedCache<E, D extends Object>({
   required CacheBackend backend,
+  required CacheCodec<E, D> defaultCodec,
   CacheLogger? log,
   bool deleteCorruptedEntries = true,
 }) {
-  return CacheStore(backend: backend, logger: log, deleteCorruptedEntries: deleteCorruptedEntries);
+  return CacheStore(
+    backend: backend,
+    defaultCodec: defaultCodec,
+    logger: log,
+    deleteCorruptedEntries: deleteCorruptedEntries,
+  );
 }
 
 /// Type-safe cache interface for storing and retrieving generic data.
@@ -27,7 +33,9 @@ TypedCache createTypedCache({
 ///
 /// All operations are async to support various backend implementations
 /// (file I/O, database, network, etc.).
-abstract interface class TypedCache {
+abstract interface class TypedCache<E, D extends Object> {
+  CacheCodec<E, D> get defaultCodec;
+
   /// Removes all entries from the cache.
   Future<void> clear();
 
@@ -47,11 +55,7 @@ abstract interface class TypedCache {
   /// Returns null if not found or if it's expired (unless [allowExpired]
   /// is true). Throws [CacheTypeMismatchException] or
   /// [CacheDecodeException] if the stored type doesn't match.
-  Future<D?> get<E, D extends Object>(
-    String key, {
-    required CacheCodec<E, D> codec,
-    bool allowExpired = false,
-  });
+  Future<D?> get(String key, {bool allowExpired = false});
 
   /// Gets a value from cache or fetches it if missing/expired.
   ///
@@ -70,9 +74,8 @@ abstract interface class TypedCache {
   ///   fetching fresh data in the background (stale-while-revalidate)
   ///
   /// Always returns a non-null value (either from cache or freshly fetched).
-  Future<D> getOrFetch<E, D extends Object>(
+  Future<D> getOrFetch(
     String key, {
-    required CacheCodec<E, D> codec,
     required Future<D> Function() fetch,
     Duration? ttl,
     Set<String> tags,
@@ -109,13 +112,7 @@ abstract interface class TypedCache {
   /// - [tags]: Optional tags for grouped invalidation
   ///
   /// Throws [CacheBackendException] if the backend fails.
-  Future<void> put<E, D extends Object>(
-    String key,
-    D value, {
-    required CacheCodec<E, D> codec,
-    Duration? ttl,
-    Set<String> tags,
-  });
+  Future<void> put(String key, D value, {Duration? ttl, Set<String> tags});
 
   /// Removes a single entry by key (see [invalidate] for clarity).
   Future<void> remove(String key);
