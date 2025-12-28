@@ -44,6 +44,8 @@ abstract interface class CacheBackend {
   /// reading fails (I/O errors, corruption, etc.).
   Future<CacheEntry<E>?> read<E>(String key);
 
+  Future<List<CacheEntry<E>>> readAll<E>();
+
   /// Writes an encoded cache entry to the backend.
   ///
   /// The entry is already encoded (payload is E, not D). The backend

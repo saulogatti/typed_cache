@@ -24,11 +24,13 @@ typedef CacheLogger = void Function(String message, Object? error, StackTrace? s
 /// - Lazy expiration (on access, not scheduled)
 /// - Corrupted entry cleanup
 /// - Error logging
-final class CacheStore implements TypedCache {
+final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
   final CacheBackend _backend;
   final Clock _clock;
   final TtlPolicy _ttlPolicy;
   final CacheLogger? _log;
+  @override
+  final CacheCodec<E, D> defaultCodec;
 
   /// If true, silently delete corrupted/mismatched entries instead of throwing.
   final bool deleteCorruptedEntries;
@@ -43,6 +45,7 @@ final class CacheStore implements TypedCache {
   /// - [deleteCorruptedEntries]: Auto-delete corrupted entries (default: true)
   CacheStore({
     required CacheBackend backend,
+    required this.defaultCodec,
     Clock clock = const SystemClock(),
     TtlPolicy ttlPolicy = const DefaultTtlPolicy(),
     CacheLogger? logger,
@@ -54,7 +57,6 @@ final class CacheStore implements TypedCache {
 
   @override
   Future<void> clear() => _backend.clear();
-
   @override
   Future<bool> contains(String key) async {
     final entry = await _backend.read(key);
@@ -67,21 +69,123 @@ final class CacheStore implements TypedCache {
   }
 
   @override
-  Future<D?> get<E, D extends Object>(
-    String key, {
-    required CacheCodec<E, D> codec,
-    bool allowExpired = false,
-  }) async {
+  Future<D?> get(String key, {bool allowExpired = false}) async {
     final now = _clock.nowEpochMs();
     CacheEntry<E>? entry;
-
     try {
       entry = await _backend.read<E>(key);
     } catch (e, st) {
       _log?.call('Backend read failed for key="$key"', e, st);
       throw CacheBackendException('Backend read failed for key="$key": $e');
     }
+    return await _makeData(entry, allowExpired, now, key);
+  }
 
+  @override
+  @override
+  Future<List<D>> getAll() async {
+    final listAll = await _backend.readAll<E>();
+    if (listAll.isEmpty) {
+      return [];
+    }
+
+    final now = _clock.nowEpochMs();
+    final dataFutures = listAll.map((entry) => _makeData(entry, false, now, entry.key));
+
+    final data = await Future.wait(dataFutures);
+    return data.whereType<D>().toList();
+  }
+
+  @override
+  Future<D> getOrFetch(
+    String key, {
+    required Future<D> Function() fetch,
+    Duration? ttl,
+    Set<String> tags = const {},
+    bool allowExpiredWhileRevalidating = false,
+  }) async {
+    final cached = await get(key, allowExpired: allowExpiredWhileRevalidating);
+
+    if (cached != null && !allowExpiredWhileRevalidating) return cached;
+
+    if (cached != null && allowExpiredWhileRevalidating) {
+      // Return stale but revalidate in the background.
+      // Note: This is best-effort; errors are logged but not propagated.
+      try {
+        final fresh = await fetch();
+        await put(key, fresh, ttl: ttl, tags: tags);
+      } catch (e, st) {
+        _log?.call('SWR refresh failed for key="$key"', e, st);
+      }
+      return cached;
+    }
+
+    final fresh = await fetch();
+    await put(key, fresh, ttl: ttl, tags: tags);
+    return fresh;
+  }
+
+  @override
+  Future<void> invalidate(String key) => _backend.delete(key);
+
+  @override
+  Future<void> invalidateByTag(String tag) async {
+    final keys = (await _backend.keysByTag(tag)).toList();
+    // Best-effort delete all keys with this tag.
+    for (final k in keys) {
+      try {
+        await _backend.delete(k);
+      } catch (e, st) {
+        _log?.call('Failed to delete key="$k" from tag="$tag"', e, st);
+      }
+    }
+    // Also remove the tag index if the backend supports it.
+    try {
+      await _backend.deleteTag(tag);
+    } catch (_) {
+      // Silently ignore: backend may not support tag deletion.
+    }
+  }
+
+  @override
+  Future<int> purgeExpired() async {
+    final now = _clock.nowEpochMs();
+    try {
+      return await _backend.purgeExpired(now);
+    } catch (e, st) {
+      _log?.call('Backend purgeExpired failed', e, st);
+      return 0;
+    }
+  }
+
+  @override
+  Future<void> put(String key, D value, {Duration? ttl, Set<String> tags = const {}}) async {
+    final now = _clock.nowEpochMs();
+    final expiresAt = _ttlPolicy.computeExpiresAtEpochMs(ttl: ttl, clock: _clock);
+    final codec = defaultCodec;
+    final entry = CacheEntry<E>(
+      key: key,
+      typeId: codec.typeId,
+      payload: codec.encode(value),
+      createdAtEpochMs: now,
+      expiresAtEpochMs: expiresAt,
+      tags: tags,
+    );
+
+    try {
+      await _backend.write<E>(entry);
+    } catch (e, st) {
+      throw CacheBackendException('Backend write failed for key="$key": $e\n${st.toString()}');
+    }
+  }
+
+  @override
+  Future<void> remove(String key) async {
+    await _backend.delete(key);
+  }
+
+  Future<D?> _makeData(CacheEntry<E>? entry, bool allowExpired, int now, String key) async {
+    final codec = defaultCodec;
     if (entry == null) return null;
 
     if (!allowExpired && entry.isExpired(now)) {
@@ -125,100 +229,5 @@ final class CacheStore implements TypedCache {
       }
       throw CacheDecodeException(msg, cause: e, stackTrace: st);
     }
-  }
-
-  @override
-  Future<D> getOrFetch<E, D extends Object>(
-    String key, {
-    required CacheCodec<E, D> codec,
-    required Future<D> Function() fetch,
-    Duration? ttl,
-    Set<String> tags = const {},
-    bool allowExpiredWhileRevalidating = false,
-  }) async {
-    final cached = await get<E, D>(key, codec: codec, allowExpired: allowExpiredWhileRevalidating);
-
-    if (cached != null && !allowExpiredWhileRevalidating) return cached;
-
-    if (cached != null && allowExpiredWhileRevalidating) {
-      // Return stale but revalidate in the background.
-      // Note: This is best-effort; errors are logged but not propagated.
-      try {
-        final fresh = await fetch();
-        await put<E, D>(key, fresh, codec: codec, ttl: ttl, tags: tags);
-      } catch (e, st) {
-        _log?.call('SWR refresh failed for key="$key"', e, st);
-      }
-      return cached;
-    }
-
-    final fresh = await fetch();
-    await put<E, D>(key, fresh, codec: codec, ttl: ttl, tags: tags);
-    return fresh;
-  }
-
-  @override
-  Future<void> invalidate(String key) => _backend.delete(key);
-
-  @override
-  Future<void> invalidateByTag(String tag) async {
-    final keys = (await _backend.keysByTag(tag)).toList();
-    // Best-effort delete all keys with this tag.
-    for (final k in keys) {
-      try {
-        await _backend.delete(k);
-      } catch (e, st) {
-        _log?.call('Failed to delete key="$k" from tag="$tag"', e, st);
-      }
-    }
-    // Also remove the tag index if the backend supports it.
-    try {
-      await _backend.deleteTag(tag);
-    } catch (_) {
-      // Silently ignore: backend may not support tag deletion.
-    }
-  }
-
-  @override
-  Future<int> purgeExpired() async {
-    final now = _clock.nowEpochMs();
-    try {
-      return await _backend.purgeExpired(now);
-    } catch (e, st) {
-      _log?.call('Backend purgeExpired failed', e, st);
-      return 0;
-    }
-  }
-
-  @override
-  Future<void> put<E, D extends Object>(
-    String key,
-    D value, {
-    required CacheCodec<E, D> codec,
-    Duration? ttl,
-    Set<String> tags = const {},
-  }) async {
-    final now = _clock.nowEpochMs();
-    final expiresAt = _ttlPolicy.computeExpiresAtEpochMs(ttl: ttl, clock: _clock);
-
-    final entry = CacheEntry<E>(
-      key: key,
-      typeId: codec.typeId,
-      payload: codec.encode(value),
-      createdAtEpochMs: now,
-      expiresAtEpochMs: expiresAt,
-      tags: tags,
-    );
-
-    try {
-      await _backend.write<E>(entry);
-    } catch (e, st) {
-      throw CacheBackendException('Backend write failed for key="$key": $e\n${st.toString()}');
-    }
-  }
-
-  @override
-  Future<void> remove(String key) async {
-    await _backend.delete(key);
   }
 }
