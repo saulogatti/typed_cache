@@ -56,7 +56,14 @@ abstract interface class TypedCache<E, D extends Object> {
   /// [CacheDecodeException] if the stored type doesn't match.
   Future<D?> get(String key, {bool allowExpired = false});
 
-  Future<List<D>?> getAll();
+  /// Retrieves all valid, non-expired values from the cache that match the
+  /// store's default codec.
+  ///
+  /// Expired or corrupted entries are ignored and may be lazily deleted.
+  ///
+  /// Returns a list of decoded values. The list will be empty if no valid
+  /// entries are found.
+  Future<List<D>> getAll();
 
   /// Gets a value from cache or fetches it if missing/expired.
   ///

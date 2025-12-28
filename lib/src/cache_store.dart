@@ -82,20 +82,18 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
   }
 
   @override
-  Future<List<D>?> getAll() async {
+  @override
+  Future<List<D>> getAll() async {
     final listAll = await _backend.readAll<E>();
     if (listAll.isEmpty) {
-      return null;
-    }
-    final listFutures = <D>[];
-    for (final entry in listAll) {
-      final data = await _makeData(entry, false, _clock.nowEpochMs(), entry.key);
-      if (data != null) {
-        listFutures.add(data);
-      }
+      return [];
     }
 
-    return listFutures;
+    final now = _clock.nowEpochMs();
+    final dataFutures = listAll.map((entry) => _makeData(entry, false, now, entry.key));
+
+    final data = await Future.wait(dataFutures);
+    return data.whereType<D>().toList();
   }
 
   @override

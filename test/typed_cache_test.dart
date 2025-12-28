@@ -186,6 +186,11 @@ void main() {
         // Assert
         expect(await cache.get(strKey), equals('hello'));
         expect(await cacheInt.get(intKey), equals(42));
+
+        // Also test that getting with the wrong codec fails as expected
+        // (returns null because deleteCorruptedEntries is true by default).
+        expect(await cache.get(intKey), isNull);
+        expect(await cacheInt.get(strKey), isNull);
       });
     });
 
@@ -324,6 +329,94 @@ void main() {
           () => cache.getOrFetch('key', fetch: () async => throw Exception('Network error')),
           throwsA(isA<Exception>()),
         );
+      });
+    });
+
+    group('getAll', () {
+      test('returns empty list when cache is empty', () async {
+        final results = await cache.getAll();
+        expect(results, isEmpty);
+      });
+
+      test('returns all valid items', () async {
+        // Arrange
+        await cache.put('key1', 'value1');
+        await cache.put('key2', 'value2');
+
+        // Act
+        final results = await cache.getAll();
+
+        // Assert
+        expect(results, containsAll(['value1', 'value2']));
+        expect(results.length, equals(2));
+      });
+
+      test('returns only valid items (filtering expired and corrupted)', () async {
+        // Arrange
+        // 1. Item válido
+        await cache.put('valid', 'ok');
+
+        // 2. Item expirado
+        await cache.put('expired', 'gone', ttl: const Duration(seconds: 10));
+        clock.advance(const Duration(seconds: 20));
+
+        // 3. Item corrompido (typeId errado)
+        // Injetamos direto no backend para simular corrupção/mudança de versão
+        await backend.write(
+          CacheEntry(
+            key: 'corrupted',
+            typeId: 'wrong_type',
+            payload: 'data',
+            createdAtEpochMs: clock.nowEpochMs(),
+            expiresAtEpochMs: null,
+            tags: {},
+          ),
+        );
+
+        // Act
+        final results = await cache.getAll();
+
+        // Assert
+        expect(results, equals(['ok']));
+        // Verifica se a limpeza preguiçosa (lazy cleanup) funcionou
+        expect(await backend.read('expired'), isNull);
+        expect(await backend.read('corrupted'), isNull);
+      });
+
+      test('returns empty list when all items are invalid', () async {
+        // Arrange
+        await cache.put('expired', 'gone', ttl: const Duration(seconds: 10));
+        clock.advance(const Duration(seconds: 20));
+
+        // Act
+        final results = await cache.getAll();
+
+        // Assert
+        expect(results, isEmpty);
+      });
+
+      test('throws when corrupted and deleteCorruptedEntries is false', () async {
+        // Arrange
+        final strictCache = CacheStore(
+          backend: backend,
+          defaultCodec: StringCodec(),
+          clock: clock,
+          deleteCorruptedEntries: false,
+        );
+
+        await backend.write(
+          CacheEntry(
+            key: 'corrupted',
+            typeId: 'wrong_type',
+            payload: 'data',
+            createdAtEpochMs: clock.nowEpochMs(),
+            expiresAtEpochMs: null,
+            tags: {},
+          ),
+        );
+
+        // Act & Assert
+        expect(() => strictCache.getAll(), throwsA(isA<CacheTypeMismatchException>()));
       });
     });
 
