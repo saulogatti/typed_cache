@@ -1,6 +1,8 @@
 import 'package:typed_cache/src/cache_store.dart';
 import 'package:typed_cache/typed_cache.dart';
 
+export 'package:typed_cache/src/cache_store.dart' show CacheLogger;
+
 TypedCache createTypedCache({
   required CacheBackend backend,
   CacheLogger? log,
@@ -11,9 +13,7 @@ TypedCache createTypedCache({
 
 abstract interface class TypedCache {
   Future<void> clear();
-
   Future<bool> contains(String key);
-
   Future<D?> get<E, D extends Object>(
     String key, {
     required CacheCodec<E, D> codec,
@@ -43,4 +43,6 @@ abstract interface class TypedCache {
     Duration? ttl,
     Set<String> tags,
   });
+
+  Future<void> remove(String key);
 }

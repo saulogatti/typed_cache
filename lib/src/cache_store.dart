@@ -194,4 +194,9 @@ final class CacheStore implements TypedCache {
       );
     }
   }
+
+  @override
+  Future<void> remove(String key) async {
+    await _backend.delete(key);
+  }
 }
