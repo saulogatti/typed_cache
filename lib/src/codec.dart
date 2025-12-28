@@ -1,6 +1,6 @@
-abstract interface class CacheCodec<E, D extends Object> {
+abstract interface class CacheCodec<E, D> {
   /// Stable identifier for the encoded type/schema.
-  /// Examples: 'user:v1', 'profile:v2', 'List<User>:v1'
+  /// Examples: 'user:v1', 'profile:v2', 'List:v1'
   String get typeId;
 
   /// Must decode from what `encode` produced.

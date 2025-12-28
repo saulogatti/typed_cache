@@ -16,7 +16,7 @@ abstract interface class CacheBackend {
   /// Return count removed.
   Future<int> purgeExpired(int nowEpochMs);
 
-  Future<CacheEntry?> read(String key);
+  Future<CacheEntry<E>?> read<E>(String key);
 
-  Future<void> write(CacheEntry entry);
+  Future<void> write<E>(CacheEntry<E> entry);
 }

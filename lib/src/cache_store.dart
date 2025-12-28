@@ -6,8 +6,7 @@ import 'policy/clock.dart';
 import 'policy/ttl_policy.dart';
 import 'typed_cache.dart';
 
-typedef CacheLogger =
-    void Function(String message, Object? error, StackTrace? st);
+typedef CacheLogger = void Function(String message, Object? error, StackTrace? st);
 
 final class CacheStore implements TypedCache {
   final CacheBackend _backend;
@@ -51,10 +50,10 @@ final class CacheStore implements TypedCache {
     bool allowExpired = false,
   }) async {
     final now = _clock.nowEpochMs();
-    CacheEntry? entry;
+    CacheEntry<E>? entry;
 
     try {
-      entry = await _backend.read(key);
+      entry = await _backend.read<E>(key);
     } catch (e, st) {
       _log?.call('Backend read failed for key="$key"', e, st);
       throw CacheBackendException('Backend read failed for key="$key": $e');
@@ -73,8 +72,7 @@ final class CacheStore implements TypedCache {
     }
 
     if (entry.typeId != codec.typeId) {
-      final msg =
-          'Type mismatch for key="$key": stored="${entry.typeId}" requested="${codec.typeId}"';
+      final msg = 'Type mismatch for key="$key": stored="${entry.typeId}" requested="${codec.typeId}"';
       if (deleteCorruptedEntries) {
         _log?.call(msg, null, null);
         try {
@@ -113,11 +111,7 @@ final class CacheStore implements TypedCache {
     Set<String> tags = const {},
     bool allowExpiredWhileRevalidating = false,
   }) async {
-    final cached = await get<E, D>(
-      key,
-      codec: codec,
-      allowExpired: allowExpiredWhileRevalidating,
-    );
+    final cached = await get<E, D>(key, codec: codec, allowExpired: allowExpiredWhileRevalidating);
 
     if (cached != null && !allowExpiredWhileRevalidating) return cached;
 
@@ -180,12 +174,9 @@ final class CacheStore implements TypedCache {
     Set<String> tags = const {},
   }) async {
     final now = _clock.nowEpochMs();
-    final expiresAt = _ttlPolicy.computeExpiresAtEpochMs(
-      ttl: ttl,
-      clock: _clock,
-    );
+    final expiresAt = _ttlPolicy.computeExpiresAtEpochMs(ttl: ttl, clock: _clock);
 
-    final entry = CacheEntry(
+    final entry = CacheEntry<E>(
       key: key,
       typeId: codec.typeId,
       payload: codec.encode(value),
@@ -195,7 +186,7 @@ final class CacheStore implements TypedCache {
     );
 
     try {
-      await _backend.write(entry);
+      await _backend.write<E>(entry);
     } catch (e, st) {
       throw CacheBackendException(
         'Backend write failed for key="$key": $e'
