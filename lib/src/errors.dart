@@ -24,6 +24,13 @@ final class CacheDecodeException extends TypedCacheException {
   });
 }
 
+/// Thrown when a cache operation is attempted with an empty key.
+/// Keys must be non-empty strings.
+final class CacheKeyEmptyException extends TypedCacheException {
+  const CacheKeyEmptyException({required super.stackTrace})
+    : super('Cache key cannot be empty.');
+}
+
 /// Thrown when retrieving an entry with a mismatched type.
 ///
 /// This happens when the codec's typeId doesn't match the stored type,
