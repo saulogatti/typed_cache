@@ -1,6 +1,6 @@
 name: typed_cache
 description: A strongly-typed, generic caching library for Dart.
-version: 0.2.0
+version: 0.2.1
 repository: https://github.com/saulogatti/typed_cache.git
 environment:
   sdk: ^3.10.4
