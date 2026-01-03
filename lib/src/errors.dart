@@ -5,7 +5,7 @@ import 'package:typed_cache/src/cache_store.dart';
 /// This indicates a serious issue with the storage layer that the
 /// application cannot recover from (e.g., disk full, connection lost).
 final class CacheBackendException extends TypedCacheException {
-  const CacheBackendException(super.message);
+  const CacheBackendException(super.message, {required super.stackTrace});
 }
 
 /// Thrown when decoding a cache entry fails.
@@ -17,10 +17,11 @@ final class CacheDecodeException extends TypedCacheException {
   /// The original exception that caused the decode failure.
   final Object cause;
 
-  /// Stack trace of the original exception.
-  final StackTrace stackTrace;
-
-  const CacheDecodeException(super.message, {required this.cause, required this.stackTrace});
+  const CacheDecodeException(
+    super.message, {
+    required this.cause,
+    required super.stackTrace,
+  });
 }
 
 /// Thrown when retrieving an entry with a mismatched type.
@@ -30,14 +31,14 @@ final class CacheDecodeException extends TypedCacheException {
 /// configured with [CacheStore.deleteCorruptedEntries], this exception is caught
 /// internally and the entry is deleted.
 final class CacheTypeMismatchException extends TypedCacheException {
-  const CacheTypeMismatchException(super.message);
+  const CacheTypeMismatchException(super.message, {required super.stackTrace});
 }
 
 /// Thrown when an operation is not supported by the backend.
 ///
 /// For example, some backends may not support tag-based queries.
 final class CacheUnsupportedOperation extends TypedCacheException {
-  const CacheUnsupportedOperation(super.message);
+  const CacheUnsupportedOperation(super.message, {required super.stackTrace});
 }
 
 /// Base exception for all cache-related errors.
@@ -46,8 +47,9 @@ final class CacheUnsupportedOperation extends TypedCacheException {
 /// a descriptive message for debugging.
 sealed class TypedCacheException implements Exception {
   final String message;
-  const TypedCacheException(this.message);
+  final StackTrace stackTrace;
+  const TypedCacheException(this.message, {required this.stackTrace});
 
   @override
-  String toString() => '$runtimeType: $message';
+  String toString() => '$runtimeType: $message \n$stackTrace';
 }

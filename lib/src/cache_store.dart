@@ -10,7 +10,8 @@ import 'typed_cache.dart';
 ///
 /// Called when cache operations succeed or fail. Useful for debugging
 /// and monitoring cache health.
-typedef CacheLogger = void Function(String message, Object? error, StackTrace? st);
+typedef CacheLogger =
+    void Function(String message, Object? error, StackTrace? st);
 
 /// Production [TypedCache] implementation.
 ///
@@ -59,6 +60,7 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
   Future<void> clear() => _backend.clear();
   @override
   Future<bool> contains(String key) async {
+    _validKey(key);
     final entry = await _backend.read(key);
     if (entry == null) return false;
 
@@ -70,13 +72,17 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
 
   @override
   Future<D?> get(String key, {bool allowExpired = false}) async {
+    _validKey(key);
     final now = _clock.nowEpochMs();
     CacheEntry<E>? entry;
     try {
       entry = await _backend.read<E>(key);
     } catch (e, st) {
       _log?.call('Backend read failed for key="$key"', e, st);
-      throw CacheBackendException('Backend read failed for key="$key": $e');
+      throw CacheBackendException(
+        'Backend read failed for key="$key": $e',
+        stackTrace: st,
+      );
     }
     return await _makeData(entry, allowExpired, now, key);
   }
@@ -90,7 +96,9 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
     }
 
     final now = _clock.nowEpochMs();
-    final dataFutures = listAll.map((entry) => _makeData(entry, false, now, entry.key));
+    final dataFutures = listAll.map(
+      (entry) => _makeData(entry, false, now, entry.key),
+    );
 
     final data = await Future.wait(dataFutures);
     return data.whereType<D>().toList();
@@ -126,7 +134,7 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
   }
 
   @override
-  Future<void> invalidate(String key) => _backend.delete(key);
+  Future<void> invalidate(String key) => _delete(key);
 
   @override
   Future<void> invalidateByTag(String tag) async {
@@ -159,9 +167,18 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
   }
 
   @override
-  Future<void> put(String key, D value, {Duration? ttl, Set<String> tags = const {}}) async {
+  Future<void> put(
+    String key,
+    D value, {
+    Duration? ttl,
+    Set<String> tags = const {},
+  }) async {
+    _validKey(key);
     final now = _clock.nowEpochMs();
-    final expiresAt = _ttlPolicy.computeExpiresAtEpochMs(ttl: ttl, clock: _clock);
+    final expiresAt = _ttlPolicy.computeExpiresAtEpochMs(
+      ttl: ttl,
+      clock: _clock,
+    );
     final codec = defaultCodec;
     final entry = CacheEntry<E>(
       key: key,
@@ -175,18 +192,34 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
     try {
       await _backend.write<E>(entry);
     } catch (e, st) {
-      throw CacheBackendException('Backend write failed for key="$key": $e\n${st.toString()}');
+      throw CacheBackendException(
+        'Backend write failed for key="$key": $e\n${st.toString()}',
+        stackTrace: st,
+      );
     }
   }
 
   @override
   Future<void> remove(String key) async {
+    _validKey(key);
     await _backend.delete(key);
   }
 
-  Future<D?> _makeData(CacheEntry<E>? entry, bool allowExpired, int now, String key) async {
+  Future<void> _delete(String key) async {
+    _validKey(key);
+    await _backend.delete(key);
+  }
+
+  Future<D?> _makeData(
+    CacheEntry<E>? entry,
+    bool allowExpired,
+    int now,
+    String key,
+  ) async {
     final codec = defaultCodec;
     if (entry == null) return null;
+
+    _validKey(key);
 
     if (!allowExpired && entry.isExpired(now)) {
       // Lazy expiration cleanup.
@@ -211,7 +244,7 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
         }
         return null;
       }
-      throw CacheTypeMismatchException(msg);
+      throw CacheTypeMismatchException(msg, stackTrace: StackTrace.current);
     }
 
     try {
@@ -228,6 +261,15 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
         return null;
       }
       throw CacheDecodeException(msg, cause: e, stackTrace: st);
+    }
+  }
+
+  void _validKey(String key) {
+    if (key.isEmpty) {
+      throw CacheTypeMismatchException(
+        'Cache key cannot be empty',
+        stackTrace: StackTrace.current,
+      );
     }
   }
 }
