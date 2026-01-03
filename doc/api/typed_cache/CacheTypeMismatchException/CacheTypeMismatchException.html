@@ -54,8 +54,9 @@
 
     <section class="multi-line-signature">
       const
-      <span class="name ">CacheTypeMismatchException</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="-param-message"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">message</span></span></li>
-</ol>)
+      <span class="name ">CacheTypeMismatchException</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="-param-message"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.10.4/dart-core/String-class.html">String</a></span> <span class="parameter-name">message</span>, {</span></li>
+<li><span class="parameter" id="-param-stackTrace"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/stable/3.10.4/dart-core/StackTrace-class.html">StackTrace</a></span> <span class="parameter-name">stackTrace</span>, </span></li>
+</ol>})
     </section>
     
 
@@ -63,7 +64,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">const CacheTypeMismatchException(super.message);</code></pre>
+  <pre class="language-dart"><code class="language-dart">const CacheTypeMismatchException(super.message, {required super.stackTrace});</code></pre>
 </section>
 
 
@@ -91,7 +92,7 @@
 <footer>
   <span class="no-break">
     typed_cache
-      0.2.0
+      0.2.1
   </span>
   
 </footer>
