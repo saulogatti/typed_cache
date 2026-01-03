@@ -57,7 +57,10 @@ void main() {
         // Assert
         expect(retrieved, isNull);
       });
-
+      test('empty key ', () async {
+        // Arrange & Act & Assert
+        expect(() => cache.get(''), throwsA(isA<CacheTypeMismatchException>()));
+      });
       test('stores multiple values independently', () async {
         // Arrange
 
