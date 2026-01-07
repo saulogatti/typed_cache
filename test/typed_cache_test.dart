@@ -59,7 +59,7 @@ void main() {
       });
       test('empty key ', () async {
         // Arrange & Act & Assert
-        expect(() => cache.get(''), throwsA(isA<CacheTypeMismatchException>()));
+        expect(await cache.get(''), isNull);
       });
       test('stores multiple values independently', () async {
         // Arrange
@@ -275,7 +275,7 @@ void main() {
         await cache.put('key2', 'value2');
 
         // Act
-        await cache.invalidate('key1');
+        await cache.remove('key1');
 
         // Assert
         expect(await cache.contains('key1'), isFalse);
@@ -345,6 +345,85 @@ void main() {
           ),
           throwsA(isA<Exception>()),
         );
+      });
+    });
+
+    group('getOrFetchWithResult', () {
+      test('returns cached value if exists', () async {
+        await cache.put('key', 'cached');
+        var fetchCalled = false;
+
+        final result = await cache.getOrFetchWithResult(
+          'key',
+          fetch: () async {
+            fetchCalled = true;
+            return 'fresh';
+          },
+        );
+
+        expect(result.isSuccess, isTrue);
+        expect(result.getOrNull, equals('cached'));
+        expect(fetchCalled, isFalse);
+      });
+
+      test('fetches and stores if not cached', () async {
+        const key = 'new_key';
+        const value = 'fresh_value';
+
+        final result = await cache.getOrFetchWithResult(
+          key,
+          fetch: () async => value,
+        );
+
+        expect(result.isSuccess, isTrue);
+        expect(result.getOrNull, equals(value));
+        expect(await cache.get(key), equals(value));
+      });
+
+      test('returns failure when fetch throws CacheBackendException', () async {
+        final exception = CacheBackendException(
+          'Fetch error',
+          stackTrace: StackTrace.current,
+        );
+
+        final result = await cache.getOrFetchWithResult(
+          'key',
+          fetch: () async => throw exception,
+        );
+
+        expect(result.isFailure, isTrue);
+        expect(result.failureOrNull, equals(exception));
+      });
+
+      test('returns failure when fetch throws generic exception', () async {
+        final result = await cache.getOrFetchWithResult(
+          'key',
+          fetch: () async => throw Exception('Generic error'),
+        );
+
+        expect(result.isFailure, isTrue);
+        expect(result.failureOrNull, isA<CacheBackendException>());
+        expect(
+          result.failureOrNull?.message,
+          contains('Cache miss for key="key" failed'),
+        );
+      });
+
+      test('returns failure when put fails', () async {
+        final failingCache = CacheStore(
+          backend: FailingWriteOnlyBackend(),
+          defaultCodec: codec,
+          clock: clock,
+        );
+
+        final result = await failingCache.getOrFetchWithResult(
+          'key',
+          fetch: () async => 'data',
+        );
+
+        expect(result.isFailure, isTrue);
+        expect(result.failureOrNull, isA<CacheBackendException>());
+        expect(result.failureOrNull?.message, contains('Write failed'));
       });
     });
 
@@ -658,6 +737,14 @@ class FailingDecodeCodec implements CacheCodec<String, String> {
 
   @override
   String encode(String value) => value;
+}
+
+/// Backend that fails only on write operations.
+class FailingWriteOnlyBackend extends FakeCacheBackend {
+  @override
+  Future<void> write<E>(CacheEntry<E> entry) async {
+    throw CacheBackendException('Write failed', stackTrace: StackTrace.current);
+  }
 }
 
 /// Fake in-memory backend for testing.
