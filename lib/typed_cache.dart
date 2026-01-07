@@ -50,3 +50,4 @@ export 'src/errors.dart';
 export 'src/policy/clock.dart';
 export 'src/policy/ttl_policy.dart';
 export 'src/typed_cache.dart';
+export 'src/utils/typed_result.dart';

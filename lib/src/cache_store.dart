@@ -5,6 +5,7 @@ import 'errors.dart';
 import 'policy/clock.dart';
 import 'policy/ttl_policy.dart';
 import 'typed_cache.dart';
+import 'utils/typed_result.dart';
 
 /// Signature for cache logging functions.
 ///
@@ -130,6 +131,35 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
     final fresh = await fetch();
     await put(key, fresh, ttl: ttl, tags: tags);
     return fresh;
+  }
+
+  @override
+  Future<Result<D, CacheBackendException>> getOrFetchWithResult(
+    String key, {
+    required Future<D> Function() fetch,
+    Duration? ttl,
+    Set<String> tags = const {},
+  }) async {
+    final cached = await get(key);
+
+    if (cached != null) {
+      return Result.success(cached);
+    }
+
+    try {
+      final fresh = await fetch();
+      await put(key, fresh, ttl: ttl, tags: tags);
+      return Result.success(fresh);
+    } on CacheBackendException catch (e) {
+      return Result.failure(e);
+    } catch (e, st) {
+      return Result.failure(
+        CacheBackendException(
+          'Cache miss for key="$key" failed: $e',
+          stackTrace: st,
+        ),
+      );
+    }
   }
 
   @Deprecated('invalidate is deprecated, use remove instead')

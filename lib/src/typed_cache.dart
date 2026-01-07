@@ -89,9 +89,31 @@ abstract interface class TypedCache<E, D extends Object> {
     bool allowExpiredWhileRevalidating = false,
   });
 
+  /// Gets a value from cache or fetches it if missing/expired, returning
+  /// a [Result] that encapsulates success or failure.
+  ///
+  /// This is the primary method for cache-aside pattern:
+  /// 1. Try to get from cache
+  /// 2. If missing/expired, call [fetch] to get fresh data and wrap in Result
+  /// 3. Store the result with optional [ttl] and [tags]
+  ///
+  /// Parameters:
+  /// - [key]: The cache key
+  /// - [fetch]: Function that returns fresh data
+  /// - [ttl]: Optional time-to-live for cached value
+  /// - [tags]: Optional tags for grouped invalidation
+  ///
+  Future<Result<D, CacheBackendException>> getOrFetchWithResult(
+    String key, {
+    required Future<D> Function() fetch,
+    Duration? ttl,
+    Set<String> tags,
+  });
+
   /// Removes a single entry by key.
   ///
   /// This is an alias for [remove] but more explicit about invalidation intent.
+  @Deprecated('invalidate is deprecated, use remove instead')
   Future<void> invalidate(String key);
 
   /// Removes all entries with the given [tag].
@@ -120,6 +142,6 @@ abstract interface class TypedCache<E, D extends Object> {
   /// Throws [CacheBackendException] if the backend fails.
   Future<void> put(String key, D value, {Duration? ttl, Set<String> tags});
 
-  /// Removes a single entry by key (see [invalidate] for clarity).
+  /// Removes a single entry by key.
   Future<void> remove(String key);
 }
