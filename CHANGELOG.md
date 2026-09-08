@@ -1,9 +1,14 @@
+## 0.3.1
+
+- Added an analyzer configuration file.
+- Updated Dart SDK version to 3.13.0.
+
 ## 0.3.0
-- add result classes for cache operations
-- add bulk operations for get, set, remove, and contains
+
+- Added result classes for cache operations
+- Added bulk operations for get, set, remove, and contains
 - Improved performance of cache retrieval by optimizing internal data structures.
 - Updated dependencies to the latest versions for better security and performance.
-
 
 ## 0.2.1
 - Fixed a bug where an empty string could be used as a cache key.
@@ -14,4 +19,4 @@
 
 ## 0.1.0
 
-- Initial version..
+- Initial version.

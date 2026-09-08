@@ -1,1 +1,14 @@
 include: package:lints/recommended.yaml
+
+formatter:
+  page_width: 100
+
+analyzer:
+  language:
+    strict-casts: true
+
+rules:
+  avoid_print: true
+  prefer_const_constructors: true
+  deprecated_member_use: true
+  prefer_final_fields: true
