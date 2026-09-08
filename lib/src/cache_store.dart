@@ -11,8 +11,7 @@ import 'utils/typed_result.dart';
 ///
 /// Called when cache operations succeed or fail. Useful for debugging
 /// and monitoring cache health.
-typedef CacheLogger =
-    void Function(String message, Object? error, StackTrace? st);
+typedef CacheLogger = void Function(String message, Object? error, StackTrace? st);
 
 /// Production [TypedCache] implementation.
 ///
@@ -40,29 +39,26 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
   /// Creates a new cache instance.
   ///
   /// Parameters:
-  /// - [backend]: Required storage backend
-  /// - [clock]: Time source (default: [SystemClock])
-  /// - [ttlPolicy]: TTL computation strategy (default: [DefaultTtlPolicy])
+  /// - [_backend]: Required storage backend
+  /// - [_clock]: Time source (default: [SystemClock])
+  /// - [_ttlPolicy]: TTL computation strategy (default: [DefaultTtlPolicy])
   /// - [logger]: Optional logging function
   /// - [deleteCorruptedEntries]: Auto-delete corrupted entries (default: true)
   CacheStore({
-    required CacheBackend backend,
+    required this._backend,
     required this.defaultCodec,
-    Clock clock = const SystemClock(),
-    TtlPolicy ttlPolicy = const DefaultTtlPolicy(),
+    this._clock = const SystemClock(),
+    this._ttlPolicy = const DefaultTtlPolicy(),
     CacheLogger? logger,
     this.deleteCorruptedEntries = true,
-  }) : _backend = backend,
-       _clock = clock,
-       _ttlPolicy = ttlPolicy,
-       _log = logger;
+  }) : _log = logger;
 
   @override
   Future<void> clear() => _backend.clear();
   @override
   Future<bool> contains(String key) async {
     _validKey(key, false);
-    final entry = await _backend.read(key);
+    final entry = await _backend.read<dynamic>(key);
     if (entry == null) return false;
 
     final now = _clock.nowEpochMs();
@@ -80,10 +76,7 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
       entry = await _backend.read<E>(key);
     } catch (e, st) {
       _log?.call('Backend read failed for key="$key"', e, st);
-      throw CacheBackendException(
-        'Backend read failed for key="$key": $e',
-        stackTrace: st,
-      );
+      throw CacheBackendException('Backend read failed for key="$key": $e', stackTrace: st);
     }
     return await _makeData(entry, allowExpired, now, key);
   }
@@ -96,9 +89,7 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
     }
 
     final now = _clock.nowEpochMs();
-    final dataFutures = listAll.map(
-      (entry) => _makeData(entry, false, now, entry.key),
-    );
+    final dataFutures = listAll.map((entry) => _makeData(entry, false, now, entry.key));
 
     final data = await Future.wait(dataFutures);
     return data.whereType<D>().toList();
@@ -154,10 +145,7 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
       return Result.failure(e);
     } catch (e, st) {
       return Result.failure(
-        CacheBackendException(
-          'Cache miss for key="$key" failed: $e',
-          stackTrace: st,
-        ),
+        CacheBackendException('Cache miss for key="$key" failed: $e', stackTrace: st),
       );
     }
   }
@@ -197,18 +185,10 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
   }
 
   @override
-  Future<void> put(
-    String key,
-    D value, {
-    Duration? ttl,
-    Set<String> tags = const {},
-  }) async {
+  Future<void> put(String key, D value, {Duration? ttl, Set<String> tags = const {}}) async {
     _validKey(key, true);
     final now = _clock.nowEpochMs();
-    final expiresAt = _ttlPolicy.computeExpiresAtEpochMs(
-      ttl: ttl,
-      clock: _clock,
-    );
+    final expiresAt = _ttlPolicy.computeExpiresAtEpochMs(ttl: ttl, clock: _clock);
     final codec = defaultCodec;
     final entry = CacheEntry<E>(
       key: key,
@@ -235,12 +215,7 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
     await _backend.delete(key);
   }
 
-  Future<D?> _makeData(
-    CacheEntry<E>? entry,
-    bool allowExpired,
-    int now,
-    String key,
-  ) async {
+  Future<D?> _makeData(CacheEntry<E>? entry, bool allowExpired, int now, String key) async {
     final codec = defaultCodec;
     if (entry == null) return null;
 
