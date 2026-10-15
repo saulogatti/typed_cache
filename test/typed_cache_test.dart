@@ -12,7 +12,8 @@ import 'package:typed_cache/typed_cache.dart';
 
 void main() {
   group('CacheStore', () {
-    late CacheStore cache, cacheInt;
+    late CacheStore cache;
+    late CacheStore cacheInt;
     late FakeCacheBackend backend;
     late FakeClock clock;
     final codec = StringCodec();
@@ -21,18 +22,8 @@ void main() {
     setUp(() {
       backend = FakeCacheBackend();
       clock = FakeClock();
-      cache = CacheStore(
-        backend: backend,
-        defaultCodec: codec,
-        clock: clock,
-        ttlPolicy: const DefaultTtlPolicy(),
-      );
-      cacheInt = CacheStore(
-        backend: backend,
-        defaultCodec: intCodec,
-        clock: clock,
-        ttlPolicy: const DefaultTtlPolicy(),
-      );
+      cache = CacheStore(backend: backend, defaultCodec: codec, clock: clock);
+      cacheInt = CacheStore(backend: backend, defaultCodec: intCodec, clock: clock);
     });
 
     group('put and get', () {
@@ -83,7 +74,7 @@ void main() {
 
         // Act
         await cache.put(key, 'value', ttl: ttl);
-        clock.advance(Duration(minutes: 2));
+        clock.advance(const Duration(minutes: 2));
         final retrieved = await cache.get(key);
 
         // Assert
@@ -98,7 +89,7 @@ void main() {
 
         // Act
         await cache.put(key, 'value', ttl: ttl);
-        clock.advance(Duration(minutes: 2));
+        clock.advance(const Duration(minutes: 2));
         final retrieved = await cache.get(key);
 
         // Assert
@@ -113,7 +104,7 @@ void main() {
 
         // Act
         await cache.put(key, 'stale-value', ttl: ttl);
-        clock.advance(Duration(minutes: 2));
+        clock.advance(const Duration(minutes: 2));
         final retrieved = await cache.get(key, allowExpired: true);
 
         // Assert
@@ -123,9 +114,9 @@ void main() {
       test('purgeExpired removes expired entries', () async {
         // Arrange
 
-        await cache.put('key1', 'value1', ttl: Duration(seconds: 30));
-        clock.advance(Duration(seconds: 60));
-        await cache.put('key2', 'value2', ttl: Duration(hours: 1));
+        await cache.put('key1', 'value1', ttl: const Duration(seconds: 30));
+        clock.advance(const Duration(seconds: 60));
+        await cache.put('key2', 'value2', ttl: const Duration(hours: 1));
 
         // Act
         final purged = await cache.purgeExpired();
@@ -155,8 +146,8 @@ void main() {
       test('returns false for expired entries', () async {
         // Arrange
 
-        await cache.put('key', 'value', ttl: Duration(seconds: 10));
-        clock.advance(Duration(seconds: 20));
+        await cache.put('key', 'value', ttl: const Duration(seconds: 10));
+        clock.advance(const Duration(seconds: 20));
 
         // Act & Assert
         expect(await cache.contains('key'), isFalse);
@@ -198,45 +189,34 @@ void main() {
     });
 
     group('decode errors', () {
-      test(
-        'silently deletes on decode failure with deleteCorruptedEntries=true',
-        () async {
-          // Arrange
-          final codec = FailingDecodeCodec();
-          final cache = CacheStore(
-            backend: backend,
-            clock: clock,
-            deleteCorruptedEntries: true,
-            defaultCodec: codec,
-          );
-          await cache.put('key', 'value');
+      test('silently deletes on decode failure with deleteCorruptedEntries=true', () async {
+        // Arrange
+        final codec = FailingDecodeCodec();
+        final cache = CacheStore(backend: backend, clock: clock, defaultCodec: codec);
+        await cache.put('key', 'value');
 
-          // Act
-          final retrieved = await cache.get('key');
+        // Act
+        final retrieved = await cache.get('key');
 
-          // Assert - returns null due to decode error and deleteCorruptedEntries
-          expect(retrieved, isNull);
-          expect(await backend.read('key'), isNull);
-        },
-      );
+        // Assert - returns null due to decode error and deleteCorruptedEntries
+        expect(retrieved, isNull);
+        expect(await backend.read('key'), isNull);
+      });
 
-      test(
-        'throws on decode failure with deleteCorruptedEntries=false',
-        () async {
-          final codec = FailingDecodeCodec();
-          cache = CacheStore(
-            backend: backend,
-            clock: clock,
-            deleteCorruptedEntries: false,
-            defaultCodec: codec,
-          );
+      test('throws on decode failure with deleteCorruptedEntries=false', () async {
+        final codec = FailingDecodeCodec();
+        cache = CacheStore(
+          backend: backend,
+          clock: clock,
+          deleteCorruptedEntries: false,
+          defaultCodec: codec,
+        );
 
-          await cache.put('key', 'value');
+        await cache.put('key', 'value');
 
-          // Act & Assert
-          expect(() => cache.get('key'), throwsA(isA<CacheDecodeException>()));
-        },
-      );
+        // Act & Assert
+        expect(() => cache.get('key'), throwsA(isA<CacheDecodeException>()));
+      });
     });
 
     group('tags and invalidation', () {
@@ -311,11 +291,7 @@ void main() {
         const ttl = Duration(hours: 1);
 
         // Act
-        final result = await cache.getOrFetch(
-          'key',
-          fetch: () async => 'fresh',
-          ttl: ttl,
-        );
+        final result = await cache.getOrFetch('key', fetch: () async => 'fresh', ttl: ttl);
 
         // Assert
         expect(result, equals('fresh'));
@@ -334,15 +310,12 @@ void main() {
         expect((await backend.read('key'))?.tags, equals(tags));
       });
 
-      test('handles fetch errors', () async {
+      test('handles fetch errors', () {
         // Arrange
 
         // Act & Assert
         expect(
-          () => cache.getOrFetch(
-            'key',
-            fetch: () async => throw Exception('Network error'),
-          ),
+          () => cache.getOrFetch('key', fetch: () async => throw Exception('Network error')),
           throwsA(isA<Exception>()),
         );
       });
@@ -370,10 +343,7 @@ void main() {
         const key = 'new_key';
         const value = 'fresh_value';
 
-        final result = await cache.getOrFetchWithResult(
-          key,
-          fetch: () async => value,
-        );
+        final result = await cache.getOrFetchWithResult(key, fetch: () async => value);
 
         expect(result.isSuccess, isTrue);
         expect(result.getOrNull, equals(value));
@@ -381,15 +351,9 @@ void main() {
       });
 
       test('returns failure when fetch throws CacheBackendException', () async {
-        final exception = CacheBackendException(
-          'Fetch error',
-          stackTrace: StackTrace.current,
-        );
+        final exception = CacheBackendException('Fetch error', stackTrace: StackTrace.current);
 
-        final result = await cache.getOrFetchWithResult(
-          'key',
-          fetch: () async => throw exception,
-        );
+        final result = await cache.getOrFetchWithResult('key', fetch: () async => throw exception);
 
         expect(result.isFailure, isTrue);
         expect(result.failureOrNull, equals(exception));
@@ -403,10 +367,7 @@ void main() {
 
         expect(result.isFailure, isTrue);
         expect(result.failureOrNull, isA<CacheBackendException>());
-        expect(
-          result.failureOrNull?.message,
-          contains('Cache miss for key="key" failed'),
-        );
+        expect(result.failureOrNull?.message, contains('Cache miss for key="key" failed'));
       });
 
       test('returns failure when put fails', () async {
@@ -416,10 +377,7 @@ void main() {
           clock: clock,
         );
 
-        final result = await failingCache.getOrFetchWithResult(
-          'key',
-          fetch: () async => 'data',
-        );
+        final result = await failingCache.getOrFetchWithResult('key', fetch: () async => 'data');
 
         expect(result.isFailure, isTrue);
         expect(result.failureOrNull, isA<CacheBackendException>());
@@ -446,40 +404,37 @@ void main() {
         expect(results.length, equals(2));
       });
 
-      test(
-        'returns only valid items (filtering expired and corrupted)',
-        () async {
-          // Arrange
-          // 1. Item válido
-          await cache.put('valid', 'ok');
+      test('returns only valid items (filtering expired and corrupted)', () async {
+        // Arrange
+        // 1. Item válido
+        await cache.put('valid', 'ok');
 
-          // 2. Item expirado
-          await cache.put('expired', 'gone', ttl: const Duration(seconds: 10));
-          clock.advance(const Duration(seconds: 20));
+        // 2. Item expirado
+        await cache.put('expired', 'gone', ttl: const Duration(seconds: 10));
+        clock.advance(const Duration(seconds: 20));
 
-          // 3. Item corrompido (typeId errado)
-          // Injetamos direto no backend para simular corrupção/mudança de versão
-          await backend.write(
-            CacheEntry(
-              key: 'corrupted',
-              typeId: 'wrong_type',
-              payload: 'data',
-              createdAtEpochMs: clock.nowEpochMs(),
-              expiresAtEpochMs: null,
-              tags: {},
-            ),
-          );
+        // 3. Item corrompido (typeId errado)
+        // Injetamos direto no backend para simular corrupção/mudança de versão
+        await backend.write(
+          CacheEntry(
+            key: 'corrupted',
+            typeId: 'wrong_type',
+            payload: 'data',
+            createdAtEpochMs: clock.nowEpochMs(),
+            expiresAtEpochMs: null,
+            tags: {},
+          ),
+        );
 
-          // Act
-          final results = await cache.getAll();
+        // Act
+        final results = await cache.getAll();
 
-          // Assert
-          expect(results, equals(['ok']));
-          // Verifica se a limpeza preguiçosa (lazy cleanup) funcionou
-          expect(await backend.read('expired'), isNull);
-          expect(await backend.read('corrupted'), isNull);
-        },
-      );
+        // Assert
+        expect(results, equals(['ok']));
+        // Verifica se a limpeza preguiçosa (lazy cleanup) funcionou
+        expect(await backend.read('expired'), isNull);
+        expect(await backend.read('corrupted'), isNull);
+      });
 
       test('returns empty list when all items are invalid', () async {
         // Arrange
@@ -493,35 +448,29 @@ void main() {
         expect(results, isEmpty);
       });
 
-      test(
-        'throws when corrupted and deleteCorruptedEntries is false',
-        () async {
-          // Arrange
-          final strictCache = CacheStore(
-            backend: backend,
-            defaultCodec: StringCodec(),
-            clock: clock,
-            deleteCorruptedEntries: false,
-          );
+      test('throws when corrupted and deleteCorruptedEntries is false', () async {
+        // Arrange
+        final strictCache = CacheStore(
+          backend: backend,
+          defaultCodec: StringCodec(),
+          clock: clock,
+          deleteCorruptedEntries: false,
+        );
 
-          await backend.write(
-            CacheEntry(
-              key: 'corrupted',
-              typeId: 'wrong_type',
-              payload: 'data',
-              createdAtEpochMs: clock.nowEpochMs(),
-              expiresAtEpochMs: null,
-              tags: {},
-            ),
-          );
+        await backend.write(
+          CacheEntry(
+            key: 'corrupted',
+            typeId: 'wrong_type',
+            payload: 'data',
+            createdAtEpochMs: clock.nowEpochMs(),
+            expiresAtEpochMs: null,
+            tags: {},
+          ),
+        );
 
-          // Act & Assert
-          expect(
-            () => strictCache.getAll(),
-            throwsA(isA<CacheTypeMismatchException>()),
-          );
-        },
-      );
+        // Act & Assert
+        expect(strictCache.getAll, throwsA(isA<CacheTypeMismatchException>()));
+      });
     });
 
     group('clear', () {
@@ -541,7 +490,7 @@ void main() {
     });
 
     group('backend errors', () {
-      test('throws CacheBackendException on write failure', () async {
+      test('throws CacheBackendException on write failure', () {
         // Arrange
         cache = CacheStore(
           backend: FailingCacheBackend(),
@@ -550,13 +499,10 @@ void main() {
         );
 
         // Act & Assert
-        expect(
-          () => cache.put('key', 'value'),
-          throwsA(isA<CacheBackendException>()),
-        );
+        expect(() => cache.put('key', 'value'), throwsA(isA<CacheBackendException>()));
       });
 
-      test('throws CacheBackendException on read failure', () async {
+      test('throws CacheBackendException on read failure', () {
         // Arrange
         cache = CacheStore(
           backend: FailingCacheBackend(),
@@ -586,16 +532,10 @@ void main() {
 
     test('returns current time for zero/negative ttl', () {
       // Act & Assert
-      expect(
-        policy.computeExpiresAtEpochMs(ttl: Duration.zero, clock: clock),
-        equals(1000),
-      );
+      expect(policy.computeExpiresAtEpochMs(ttl: Duration.zero, clock: clock), equals(1000));
 
       expect(
-        policy.computeExpiresAtEpochMs(
-          ttl: Duration(seconds: -5),
-          clock: clock,
-        ),
+        policy.computeExpiresAtEpochMs(ttl: const Duration(seconds: -5), clock: clock),
         equals(1000),
       );
     });
@@ -603,10 +543,7 @@ void main() {
     test('returns future time for positive ttl', () {
       // Act & Assert
       expect(
-        policy.computeExpiresAtEpochMs(
-          ttl: Duration(seconds: 60),
-          clock: clock,
-        ),
+        policy.computeExpiresAtEpochMs(ttl: const Duration(seconds: 60), clock: clock),
         equals(1000 + 60 * 1000),
       );
     });
@@ -615,7 +552,7 @@ void main() {
   group('CacheEntry', () {
     test('isExpired returns true for expired entry', () {
       // Arrange
-      final entry = CacheEntry(
+      const entry = CacheEntry(
         key: 'test',
         typeId: 'string:v1',
         payload: 'value',
@@ -632,7 +569,7 @@ void main() {
 
     test('isExpired returns false for non-expiring entry', () {
       // Arrange
-      final entry = CacheEntry(
+      const entry = CacheEntry(
         key: 'test',
         typeId: 'string:v1',
         payload: 'value',
@@ -647,7 +584,7 @@ void main() {
 
     test('copyWith creates new entry with updated fields', () {
       // Arrange
-      final original = CacheEntry(
+      const original = CacheEntry(
         key: 'test',
         typeId: 'string:v1',
         payload: 'value',
@@ -657,10 +594,7 @@ void main() {
       );
 
       // Act
-      final updated = original.copyWith(
-        payload: 'new-value',
-        tags: {'tag1', 'tag2'},
-      );
+      final updated = original.copyWith(payload: 'new-value', tags: {'tag1', 'tag2'});
 
       // Assert
       expect(updated.key, equals('test'));
@@ -675,56 +609,36 @@ void main() {
 /// Failing backend for testing error scenarios.
 class FailingCacheBackend implements CacheBackend {
   @override
-  Future<void> clear() async => throw CacheBackendException(
-    'Backend error',
-    stackTrace: StackTrace.current,
-  );
+  Future<void> clear() async =>
+      throw CacheBackendException('Backend error', stackTrace: StackTrace.current);
 
   @override
-  Future<void> delete(String key) async => throw CacheBackendException(
-    'Backend error',
-    stackTrace: StackTrace.current,
-  );
+  Future<void> delete(String key) async =>
+      throw CacheBackendException('Backend error', stackTrace: StackTrace.current);
 
   @override
-  Future<void> deleteTag(String tag) async => throw CacheBackendException(
-    'Backend error',
-    stackTrace: StackTrace.current,
-  );
+  Future<void> deleteTag(String tag) async =>
+      throw CacheBackendException('Backend error', stackTrace: StackTrace.current);
 
   @override
   Future<Set<String>> keysByTag(String tag) async =>
-      throw CacheBackendException(
-        'Backend error',
-        stackTrace: StackTrace.current,
-      );
+      throw CacheBackendException('Backend error', stackTrace: StackTrace.current);
 
   @override
-  Future<int> purgeExpired(int nowEpochMs) async => throw CacheBackendException(
-    'Backend error',
-    stackTrace: StackTrace.current,
-  );
+  Future<int> purgeExpired(int nowEpochMs) async =>
+      throw CacheBackendException('Backend error', stackTrace: StackTrace.current);
 
   @override
   Future<CacheEntry<E>?> read<E>(String key) async =>
-      throw CacheBackendException(
-        'Backend error',
-        stackTrace: StackTrace.current,
-      );
+      throw CacheBackendException('Backend error', stackTrace: StackTrace.current);
   @override
   Future<List<CacheEntry<E>>> readAll<E>() {
-    throw CacheBackendException(
-      'Backend error',
-      stackTrace: StackTrace.current,
-    );
+    throw CacheBackendException('Backend error', stackTrace: StackTrace.current);
   }
 
   @override
   Future<void> write<E>(CacheEntry<E> entry) async =>
-      throw CacheBackendException(
-        'Backend error',
-        stackTrace: StackTrace.current,
-      );
+      throw CacheBackendException('Backend error', stackTrace: StackTrace.current);
 }
 
 /// Codec that fails on decode.
@@ -742,7 +656,7 @@ class FailingDecodeCodec implements CacheCodec<String, String> {
 /// Backend that fails only on write operations.
 class FailingWriteOnlyBackend extends FakeCacheBackend {
   @override
-  Future<void> write<E>(CacheEntry<E> entry) async {
+  Future<void> write<E>(CacheEntry<E> entry) {
     throw CacheBackendException('Write failed', stackTrace: StackTrace.current);
   }
 }
@@ -824,10 +738,6 @@ class FakeClock implements Clock {
 
   @override
   int nowEpochMs() => _nowEpochMs;
-
-  void setTime(int epochMs) {
-    _nowEpochMs = epochMs;
-  }
 }
 
 /// Test codec for integers.

@@ -1,10 +1,10 @@
-import 'clock.dart';
+import 'package:typed_cache/src/policy/clock.dart';
 
 /// Default TTL policy: expires at (now + ttl).
 ///
-/// - If [ttl] is null, the entry never expires
-/// - If [ttl] is zero or negative, the entry expires immediately
-/// - Otherwise, the entry expires after [ttl] from now
+/// - If `ttl` is null, the entry never expires
+/// - If `ttl` is zero or negative, the entry expires immediately
+/// - Otherwise, the entry expires after `ttl` from now
 final class DefaultTtlPolicy implements TtlPolicy {
   const DefaultTtlPolicy();
 

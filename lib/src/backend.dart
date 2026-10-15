@@ -1,4 +1,5 @@
-import 'entry.dart';
+import 'package:typed_cache/src/entry.dart';
+import 'package:typed_cache/typed_cache.dart' show CacheBackendException, CacheUnsupportedOperation, TypedCache;
 
 /// Abstract interface for pluggable cache backends.
 ///

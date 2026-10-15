@@ -76,7 +76,7 @@ sealed class Result<S, F> {
     Future<T> Function() action,
   ) async {
     try {
-      final T value = await action();
+      final value = await action();
       return Result<T, F>.success(value);
     } on F catch (e) {
       return Result<T, F>.failure(e);
@@ -96,31 +96,31 @@ extension ResultExtension<S, F> on Result<S, F> {
   ) {
     return fold<Result<R, F>>(
       onSuccess: mapper,
-      onFailure: (F error) => Result<R, F>.failure(error),
+      onFailure: Result<R, F>.failure,
     );
   }
 
   /// Flat maps a [Result] to a new [Result] with a different error type.
   Result<S, R> flatMapError<R>(Result<S, R> Function(F error) mapper) {
     return fold(
-      onSuccess: (S value) => Result<S, R>.success(value),
-      onFailure: (F error) => mapper(error),
+      onSuccess: Result<S, R>.success,
+      onFailure: (error) => mapper(error),
     );
   }
 
   /// Maps a [Result] to a new [Result] with a different success type.
   Result<R, F> map<R extends Object>(R Function(S value) mapper) {
     return fold(
-      onSuccess: (S value) => Result<R, F>.success(mapper(value)),
-      onFailure: (F error) => Result<R, F>.failure(error),
+      onSuccess: (value) => Result<R, F>.success(mapper(value)),
+      onFailure: Result<R, F>.failure,
     );
   }
 
   /// Maps a [Result] to a new [Result] with a different error type.
   Result<S, R> mapError<R>(R Function(F error) mapper) {
     return fold(
-      onSuccess: (S value) => Result<S, R>.success(value),
-      onFailure: (F error) => Result<S, R>.failure(mapper(error)),
+      onSuccess: Result<S, R>.success,
+      onFailure: (error) => Result<S, R>.failure(mapper(error)),
     );
   }
 

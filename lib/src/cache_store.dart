@@ -1,11 +1,11 @@
-import 'backend.dart';
-import 'codec.dart';
-import 'entry.dart';
-import 'errors.dart';
-import 'policy/clock.dart';
-import 'policy/ttl_policy.dart';
-import 'typed_cache.dart';
-import 'utils/typed_result.dart';
+import 'package:typed_cache/src/backend.dart';
+import 'package:typed_cache/src/codec.dart';
+import 'package:typed_cache/src/entry.dart';
+import 'package:typed_cache/src/errors.dart';
+import 'package:typed_cache/src/policy/clock.dart';
+import 'package:typed_cache/src/policy/ttl_policy.dart';
+import 'package:typed_cache/src/typed_cache.dart';
+import 'package:typed_cache/src/utils/typed_result.dart';
 
 /// Signature for cache logging functions.
 ///
@@ -203,7 +203,7 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
       await _backend.write<E>(entry);
     } catch (e, st) {
       throw CacheBackendException(
-        'Backend write failed for key="$key": $e\n${st.toString()}',
+        'Backend write failed for key="$key": $e\n$st',
         stackTrace: st,
       );
     }
