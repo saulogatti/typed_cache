@@ -1,115 +1,39 @@
-# Typed Cache
+<!--
+This README describes the package. If you publish this package to pub.dev,
+this README's contents appear on the landing page for your package.
 
-A **type-safe** Dart caching package with support for retention policies (TTL), multiple storage backends, and flexible encoding.
+For information about how to write a good package README, see the guide for
+[writing package pages](https://dart.dev/tools/pub/writing-package-pages).
+
+For general information about developing packages, see the Dart guide for
+[creating packages](https://dart.dev/tools/pub/create-packages)
+and the Flutter guide for
+[developing packages and plugins](https://flutter.dev/to/develop-packages).
+-->
+
+TODO: Put a short description of the package here that helps potential users
+know whether this package might be useful for them.
 
 ## Features
 
-- 🔒 **Type-safe:** Fully type-safe cache with generic type support in Dart
-- ⏰ **TTL Policies:** Cache item lifetime control with configurable policies
-- 🔌 **Pluggable Backends:** Support for multiple storage backends
-- 🔄 **Flexible Encoding:** Customizable codecs for serialization/deserialization
-- 🎯 **Clean Architecture:** Modular and decoupled architecture
-- 📝 **Type Entries:** Typed entries with metadata and timestamps
+TODO: List what your package can do. Maybe include images, gifs, or videos.
 
 ## Getting started
 
-### Prerequisites
-
-```yaml
-environment:
-  sdk: ^3.10.4
-```
-
-### Installation
-
-Add `typed_cache` to your `pubspec.yaml`:
-
-```bash
-flutter pub add typed_cache
-# or
-dart pub add typed_cache
-```
+TODO: List prerequisites and provide or point to information on how to
+start using the package.
 
 ## Usage
 
-### Creating a Cache
+TODO: Include short and useful examples for package users. Add longer examples
+to `/example` folder.
 
 ```dart
-import 'package:typed_cache/typed_cache.dart';
-
-// Create a cache with 5 minutes TTL
-final cache = TypedCache<String, int>(
-  backend: InMemoryBackend(),
-  policy: TtlPolicy(duration: Duration(minutes: 5)),
-);
-
-// Store a value
-await cache.set('counter', 42);
-
-// Retrieve a value
-final value = await cache.get('counter');
-print(value); // 42
-
-// Remove a value
-await cache.remove('counter');
-
-// Clear the entire cache
-await cache.clear();
+const like = 'sample';
 ```
 
-### Using Different Backends
+## Additional information
 
-```dart
-// In-memory backend (default)
-final memoryCache = TypedCache<String, String>(
-  backend: InMemoryBackend(),
-);
-
-// Custom backend
-final customCache = TypedCache<String, User>(
-  backend: MyCustomBackend(),
-  codec: JsonCodec<User>(),
-);
-```
-
-### TTL Policies
-
-```dart
-// Fixed TTL of 1 hour
-final ttlPolicy = TtlPolicy(duration: Duration(hours: 1));
-
-// Custom clock (useful for testing)
-final testPolicy = TtlPolicy(
-  duration: Duration(minutes: 5),
-  clock: FakeClock(),
-);
-```
-
-## Architecture
-
-```
-typed_cache/
-├── backend.dart       # Abstract interface for backends
-├── cache_store.dart   # Internal storage
-├── codec.dart         # Encoding/decoding
-├── entry.dart         # Typed entry with metadata
-├── errors.dart        # Custom exceptions
-├── typed_cache.dart   # Main API
-└── policy/
-    ├── clock.dart     # Clock interface (for testing)
-    └── ttl_policy.dart # TTL policy
-```
-
-## Contributing
-
-Contributions are welcome! Please:
-
-1.  Fork the repository
-2. Create a branch for your feature (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for more details.
+TODO: Tell users more about the package: where to find more information, how to
+contribute to the package, how to file issues, what response they can expect
+from the package authors, and more.
