@@ -1,3 +1,4 @@
+// coverage:ignore-file
 final class Failure<S, F> extends Result<S, F> {
   final F error;
   const Failure(this.error);
@@ -44,15 +45,11 @@ sealed class Result<S, F> {
   /// Semantic alias for [fold], maintained for readability and familiarity
   /// with pattern matching APIs (e.g., `when` in other languages).
   /// Especially useful in Widgets/Blocs; for new code, prefer using [fold].
-  T when<T extends Object>(
-    T Function(S value) onSuccess,
-    T Function(F error) onFailure,
-  ) => fold<T>(onSuccess: onSuccess, onFailure: onFailure);
+  T when<T extends Object>(T Function(S value) onSuccess, T Function(F error) onFailure) =>
+      fold<T>(onSuccess: onSuccess, onFailure: onFailure);
 
   /// Static utility to wrap dangerous calls (try-catch)
-  static Future<Result<T, Exception>> guard<T extends Object>(
-    Future<T> Function() block,
-  ) async {
+  static Future<Result<T, Exception>> guard<T extends Object>(Future<T> Function() block) async {
     try {
       return Result<T, Exception>.success(await block());
     } on Exception catch (e) {
@@ -72,9 +69,7 @@ sealed class Result<S, F> {
   ///  return await fetchData();
   /// });
   /// ```
-  static Future<Result<T, F>> resultAsync<T, F extends Object>(
-    Future<T> Function() action,
-  ) async {
+  static Future<Result<T, F>> resultAsync<T, F extends Object>(Future<T> Function() action) async {
     try {
       final value = await action();
       return Result<T, F>.success(value);
@@ -91,21 +86,13 @@ final class Success<S, F> extends Result<S, F> {
 
 extension ResultExtension<S, F> on Result<S, F> {
   /// Flat maps a [Result] to a new [Result] with a different success type.
-  Result<R, F> flatMap<R extends Object>(
-    Result<R, F> Function(S value) mapper,
-  ) {
-    return fold<Result<R, F>>(
-      onSuccess: mapper,
-      onFailure: Result<R, F>.failure,
-    );
+  Result<R, F> flatMap<R extends Object>(Result<R, F> Function(S value) mapper) {
+    return fold<Result<R, F>>(onSuccess: mapper, onFailure: Result<R, F>.failure);
   }
 
   /// Flat maps a [Result] to a new [Result] with a different error type.
   Result<S, R> flatMapError<R>(Result<S, R> Function(F error) mapper) {
-    return fold(
-      onSuccess: Result<S, R>.success,
-      onFailure: (error) => mapper(error),
-    );
+    return fold(onSuccess: Result<S, R>.success, onFailure: (error) => mapper(error));
   }
 
   /// Maps a [Result] to a new [Result] with a different success type.

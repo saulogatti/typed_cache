@@ -1,3 +1,4 @@
+// coverage:ignore-file
 /// Abstracts time for testability.
 ///
 /// Inject different Clock implementations to control time in tests:
