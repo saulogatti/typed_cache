@@ -54,8 +54,8 @@
 
     <section class="multi-line-signature">
       
-<span class="returntype"><a href="https://api.dart.dev/stable/3.13.2/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.13.2/dart-core/int-class.html">int</a></span>&gt;</span></span>
-<span class="name ">purgeExpired</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="purgeExpired-param-nowEpochMs"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.2/dart-core/int-class.html">int</a></span> <span class="parameter-name">nowEpochMs</span></span></li>
+<span class="returntype"><a href="https://api.dart.dev/stable/3.14.0/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.14.0/dart-core/int-class.html">int</a></span>&gt;</span></span>
+<span class="name ">purgeExpired</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="purgeExpired-param-nowEpochMs"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.14.0/dart-core/int-class.html">int</a></span> <span class="parameter-name">nowEpochMs</span></span></li>
 </ol>)
 
       
@@ -65,8 +65,8 @@
 <section class="desc markdown">
   <p>Removes all entries where expiresAt &lt;= <code>nowEpochMs</code>.</p>
 <p>This is a maintenance operation. The backend can implement this
-efficiently using queries (e.g., <code>WHERE expires_at &lt;= ?</code>).</p>
-<p>Returns the count of removed entries. If not supported, return 0.</p>
+efficiently using a storage-specific query.</p>
+<p>Returns the count of removed entries. Unsupported backends may return 0.</p>
 </section>
 
 
@@ -101,7 +101,7 @@ efficiently using queries (e.g., <code>WHERE expires_at &lt;= ?</code>).</p>
 <footer>
   <span class="no-break">
     typed_cache
-      0.3.1
+      0.4.0
   </span>
   
 </footer>

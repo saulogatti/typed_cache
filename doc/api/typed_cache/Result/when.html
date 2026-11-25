@@ -66,19 +66,16 @@
     </section>
     
 <section class="desc markdown">
-  <p>Semantic alias for <a href="../../typed_cache/Result/fold.html">fold</a>, maintained for readability and familiarity
-with pattern matching APIs (e.g., <code>when</code> in other languages).
-Especially useful in Widgets/Blocs; for new code, prefer using <a href="../../typed_cache/Result/fold.html">fold</a>.</p>
+  <p>Invokes one callback according to this result.</p>
+<p>Prefer <a href="../../typed_cache/Result/fold.html">fold</a> in new code when a nullable return type may be required.</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">T when&lt;T extends Object&gt;(
-  T Function(S value) onSuccess,
-  T Function(F error) onFailure,
-) =&gt; fold&lt;T&gt;(onSuccess: onSuccess, onFailure: onFailure);</code></pre>
+  <pre class="language-dart"><code class="language-dart">T when&lt;T extends Object&gt;(T Function(S value) onSuccess, T Function(F error) onFailure) =&gt;
+    fold&lt;T&gt;(onSuccess: onSuccess, onFailure: onFailure);</code></pre>
 </section>
 
 
@@ -106,7 +103,7 @@ Especially useful in Widgets/Blocs; for new code, prefer using <a href="../../ty
 <footer>
   <span class="no-break">
     typed_cache
-      0.3.1
+      0.4.0
   </span>
   
 </footer>

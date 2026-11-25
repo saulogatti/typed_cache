@@ -64,8 +64,8 @@
     
 <section class="desc markdown">
   <p>Decodes from the backend's encoded format to the domain type.</p>
-<p>Called when retrieving from cache. If decoding fails, throw an
-exception; the cache will handle cleanup based on configuration.</p>
+<p>The cache treats a thrown exception as corruption and either deletes the
+entry or surfaces a <a href="../../typed_cache/CacheDecodeException-class.html">CacheDecodeException</a>, according to configuration.</p>
 </section>
 
 
@@ -100,7 +100,7 @@ exception; the cache will handle cleanup based on configuration.</p>
 <footer>
   <span class="no-break">
     typed_cache
-      0.3.1
+      0.4.0
   </span>
   
 </footer>

@@ -54,8 +54,8 @@
 
     <section class="multi-line-signature">
       
-<span class="returntype"><a href="https://api.dart.dev/stable/3.13.2/dart-core/int-class.html">int</a>?</span>
-<span class="name ">computeExpiresAtEpochMs</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="computeExpiresAtEpochMs-param-ttl"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.2/dart-core/Duration-class.html">Duration</a>?</span> <span class="parameter-name">ttl</span>, </span></li>
+<span class="returntype"><a href="https://api.dart.dev/stable/3.14.0/dart-core/int-class.html">int</a>?</span>
+<span class="name ">computeExpiresAtEpochMs</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="computeExpiresAtEpochMs-param-ttl"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/stable/3.14.0/dart-core/Duration-class.html">Duration</a>?</span> <span class="parameter-name">ttl</span>, </span></li>
 <li><span class="parameter" id="computeExpiresAtEpochMs-param-clock"><span>required</span> <span class="type-annotation"><a href="../../typed_cache/Clock-class.html">Clock</a></span> <span class="parameter-name">clock</span>, </span></li>
 </ol>})
 
@@ -65,17 +65,9 @@
     
 <section class="desc markdown">
   <p>Computes the expiration timestamp for an entry.</p>
-<p>Parameters:</p>
-<ul>
-<li><code>ttl</code>: The desired time-to-live, or null for no expiration</li>
-<li><code>clock</code>: The current time source</li>
-</ul>
-<p>Returns:</p>
-<ul>
-<li><code>null</code> if <code>ttl</code> is null (no expiration)</li>
-<li>Current time in ms if <code>ttl</code> is zero or negative (immediate expiration)</li>
-<li>Current time + ttl in ms otherwise</li>
-</ul>
+<p>The returned value is in epoch milliseconds. A <code>null</code> result indicates
+that the entry does not expire. Custom policies must consistently use the
+supplied <code>clock</code> rather than reading system time directly.</p>
 </section>
 
 
@@ -110,7 +102,7 @@
 <footer>
   <span class="no-break">
     typed_cache
-      0.3.1
+      0.4.0
   </span>
   
 </footer>

@@ -44,95 +44,124 @@
       
 <section class="desc markdown">
   <h1 id="typed-cache">Typed Cache</h1>
-<p>A <strong>type-safe</strong> Dart caching package with support for retention policies (TTL), multiple storage backends, and flexible encoding.</p>
-<h2 id="features">Features</h2>
-<ul>
-<li>🔒 <strong>Type-safe:</strong> Fully type-safe cache with generic type support in Dart</li>
-<li>⏰ <strong>TTL Policies:</strong> Cache item lifetime control with configurable policies</li>
-<li>🔌 <strong>Pluggable Backends:</strong> Support for multiple storage backends</li>
-<li>🔄 <strong>Flexible Encoding:</strong> Customizable codecs for serialization/deserialization</li>
-<li>🎯 <strong>Clean Architecture:</strong> Modular and decoupled architecture</li>
-<li>📝 <strong>Type Entries:</strong> Typed entries with metadata and timestamps</li>
-</ul>
-<h2 id="getting-started">Getting started</h2>
-<h3 id="prerequisites">Prerequisites</h3>
+<p>A type-safe, backend-agnostic cache coordinator for Dart. It separates domain
+values from encoded payloads while handling TTL metadata, codec version checks,
+corruption cleanup, tags, and cache-aside operations.</p>
+<h2 id="requirements">Requirements</h2>
 <pre class="language-yaml"><code class="language-yaml">environment:
-  sdk: ^3.10.4
+  sdk: ^3.14.0
 </code></pre>
-<h3 id="installation">Installation</h3>
-<p>Add <code>typed_cache</code> to your <code>pubspec.yaml</code>:</p>
-<pre class="language-bash"><code class="language-bash">flutter pub add typed_cache
-# or
-dart pub add typed_cache
+<h2 id="installation">Installation</h2>
+<pre class="language-bash"><code class="language-bash">dart pub add typed_cache
 </code></pre>
 <h2 id="usage">Usage</h2>
-<h3 id="creating-a-cache">Creating a Cache</h3>
+<p><code>typed_cache</code> does not ship a production backend. Implement <code>CacheBackend</code> for
+the required persistence, then provide a codec between its payload and domain
+type.</p>
 <pre class="language-dart"><code class="language-dart">import 'package:typed_cache/typed_cache.dart';
 
-// Create a cache with 5 minutes TTL
-final cache = TypedCache&lt;String, int&gt;(
-  backend: InMemoryBackend(),
-  policy: TtlPolicy(duration: Duration(minutes: 5)),
+final cache = createTypedCache&lt;String, User&gt;(
+  backend: MyBackend(),
+  defaultCodec: const UserCodec(),
 );
 
-// Store a value
-await cache.set('counter', 42);
-
-// Retrieve a value
-final value = await cache.get('counter');
-print(value); // 42
-
-// Remove a value
-await cache.remove('counter');
-
-// Clear the entire cache
-await cache.clear();
-</code></pre>
-<h3 id="using-different-backends">Using Different Backends</h3>
-<pre class="language-dart"><code class="language-dart">// In-memory backend (default)
-final memoryCache = TypedCache&lt;String, String&gt;(
-  backend: InMemoryBackend(),
+await cache.put(
+  'user:42',
+  user,
+  ttl: const Duration(minutes: 10),
+  tags: const {'users'},
 );
 
-// Custom backend
-final customCache = TypedCache&lt;String, User&gt;(
-  backend: MyCustomBackend(),
-  codec: JsonCodec&lt;User&gt;(),
+final cachedUser = await cache.get('user:42');
+
+final freshUser = await cache.getOrFetch(
+  'user:42',
+  fetch: () =&gt; userRepository.find('42'),
+  ttl: const Duration(minutes: 10),
+  tags: const {'users'},
 );
 </code></pre>
-<h3 id="ttl-policies">TTL Policies</h3>
-<pre class="language-dart"><code class="language-dart">// Fixed TTL of 1 hour
-final ttlPolicy = TtlPolicy(duration: Duration(hours: 1));
+<p><code>MyBackend</code>, <code>User</code>, <code>UserCodec</code>, and <code>userRepository</code> are application
+definitions. See <a href="example/example.dart"><code>example/example.dart</code></a> for the complete
+package flow and an illustrative in-memory backend.</p>
+<h3 id="codecs">Codecs</h3>
+<p>Every store uses one default codec:</p>
+<pre class="language-dart"><code class="language-dart">final class UserCodec implements CacheCodec&lt;String, User&gt; {
+  const UserCodec();
 
-// Custom clock (useful for testing)
-final testPolicy = TtlPolicy(
-  duration: Duration(minutes: 5),
-  clock: FakeClock(),
-);
+  @override
+  String get typeId =&gt; 'user:v1';
+
+  @override
+  User decode(String data) =&gt; User.fromJson(data);
+
+  @override
+  String encode(User value) =&gt; value.toJson();
+}
 </code></pre>
+<p>Increment <code>typeId</code> after an incompatible encoded schema change. Entries with
+another identifier are cache misses and are lazily deleted by default. Disable
+<code>deleteCorruptedEntries</code> only when type or decode failures must surface.</p>
+<h3 id="backends">Backends</h3>
+<p>A <code>CacheBackend</code> persists <code>CacheEntry&lt;E&gt;</code> values, including payload and
+metadata. It implements:</p>
+<ul>
+<li><code>read</code> and <code>readAll</code> for retrieval.</li>
+<li><code>write</code>, <code>delete</code>, and <code>clear</code> for mutation.</li>
+<li><code>keysByTag</code> and <code>deleteTag</code> for tag invalidation.</li>
+<li><code>purgeExpired</code> for maintenance.</li>
+</ul>
+<p>Expiration is checked lazily during reads. Call <code>purgeExpired</code> periodically to
+reclaim backend storage.</p>
+<h3 id="cache-behavior">Cache behavior</h3>
+<ul>
+<li><code>get</code> returns <code>null</code> for absent or expired values unless <code>allowExpired</code> is
+enabled.</li>
+<li><code>contains</code> reports only non-expired entries.</li>
+<li><code>getAll</code> decodes valid, non-expired entries and applies the same cleanup
+behavior as <code>get</code>.</li>
+<li>The stale mode of <code>getOrFetch</code> attempts a refresh before returning stale
+data; it does not start a detached background task.</li>
+<li><code>getOrFetchWithResult</code> converts fetch and write failures into a <code>Result</code>;
+read failures are not converted.</li>
+<li><code>invalidateByTag</code> propagates failures while discovering tagged keys. After the
+key list is available, individual delete failures are logged and index
+cleanup failures are ignored.</li>
+<li>Empty keys throw on <code>put</code>. For compatibility, read and removal operations log
+an empty-key warning and continue.</li>
+</ul>
 <h2 id="architecture">Architecture</h2>
-<pre class="language-dart"><code>typed_cache/
-├── backend.dart       # Abstract interface for backends
-├── cache_store.dart   # Internal storage
-├── codec.dart         # Encoding/decoding
-├── entry.dart         # Typed entry with metadata
-├── errors.dart        # Custom exceptions
-├── typed_cache.dart   # Main API
-└── policy/
-    ├── clock.dart     # Clock interface (for testing)
-    └── ttl_policy.dart # TTL policy
+<pre class="language-text"><code class="language-text">lib/
+├── typed_cache.dart
+└── src/
+    ├── backend.dart
+    ├── cache_store.dart
+    ├── codec.dart
+    ├── entry.dart
+    ├── errors.dart
+    ├── typed_cache.dart
+    ├── policy/
+    │   ├── clock.dart
+    │   └── ttl_policy.dart
+    └── utils/
+        └── typed_result.dart
+</code></pre>
+<h2 id="development">Development</h2>
+<pre class="language-bash"><code class="language-bash">dart format --output=none --set-exit-if-changed .
+dart analyze
+dart test
+dart doc --dry-run
 </code></pre>
 <h2 id="contributing">Contributing</h2>
-<p>Contributions are welcome! Please:</p>
 <ol>
-<li>Fork the repository</li>
-<li>Create a branch for your feature (<code>git checkout -b feature/amazing-feature</code>)</li>
-<li>Commit your changes (<code>git commit -m 'Add amazing feature'</code>)</li>
-<li>Push to the branch (<code>git push origin feature/amazing-feature</code>)</li>
-<li>Open a Pull Request</li>
+<li>Add focused tests for behavior changes.</li>
+<li>Document public APIs with <code>///</code> comments.</li>
+<li>Preserve backend and codec boundaries.</li>
+<li>Run formatting, analysis, tests, and documentation checks before opening a
+pull request.</li>
 </ol>
 <h2 id="license">License</h2>
-<p>This project is licensed under the MIT License. See the <code>LICENSE</code> file for more details.</p>
+<p>This project is licensed under the MIT License. See <a href="LICENSE">LICENSE</a>.</p>
 </section>
 
 
@@ -143,8 +172,7 @@ final testPolicy = TtlPolicy(
   <span class="name"><a href="typed_cache/">typed_cache</a></span> 
 
 </dt>
-<dd>A type-safe, pluggable cache library for Dart with TTL policies and
-flexible encoding support.
+<dd>A type-safe, backend-agnostic cache library for Dart.
 </dd>
 
         </dl>
@@ -174,7 +202,7 @@ flexible encoding support.
 <footer>
   <span class="no-break">
     typed_cache
-      0.3.1
+      0.4.0
   </span>
   
 </footer>

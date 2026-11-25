@@ -66,8 +66,7 @@
     </section>
     
 <section class="desc markdown">
-  <p>The magic method: forces handling of both cases.
-Ideal for use in Widgets/Blocs.</p>
+  <p>Applies the callback matching this result.</p>
 </section>
 
 
@@ -77,12 +76,10 @@ Ideal for use in Widgets/Blocs.</p>
   <pre class="language-dart"><code class="language-dart">T fold&lt;T extends Object?&gt;({
   required T Function(S value) onSuccess,
   required T Function(F error) onFailure,
-}) {
-  return switch (this) {
-    Success&lt;S, F&gt;(value: final S v) =&gt; onSuccess(v),
-    Failure&lt;S, F&gt;(error: final F e) =&gt; onFailure(e),
-  };
-}</code></pre>
+}) =&gt; switch (this) {
+  Success&lt;S, F&gt;(value: final S v) =&gt; onSuccess(v),
+  Failure&lt;S, F&gt;(error: final F e) =&gt; onFailure(e),
+};</code></pre>
 </section>
 
 
@@ -110,7 +107,7 @@ Ideal for use in Widgets/Blocs.</p>
 <footer>
   <span class="no-break">
     typed_cache
-      0.3.1
+      0.4.0
   </span>
   
 </footer>

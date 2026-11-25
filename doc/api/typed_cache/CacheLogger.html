@@ -53,15 +53,15 @@
 </h1></div>
     <section class="multi-line-signature">
         <span class="name ">CacheLogger</span> =
-     <span class="returntype">void Function<span class="signature">(<span class="parameter" id="param-message"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.2/dart-core/String-class.html">String</a></span> <span class="parameter-name">message</span>, </span><span class="parameter" id="param-error"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.2/dart-core/Object-class.html">Object</a>?</span> <span class="parameter-name">error</span>, </span><span class="parameter" id="param-st"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.2/dart-core/StackTrace-class.html">StackTrace</a>?</span> <span class="parameter-name">st</span></span>)</span></span>
+     <span class="returntype">void Function<span class="signature">(<span class="parameter" id="param-message"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.14.0/dart-core/String-class.html">String</a></span> <span class="parameter-name">message</span>, </span><span class="parameter" id="param-error"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.14.0/dart-core/Object-class.html">Object</a>?</span> <span class="parameter-name">error</span>, </span><span class="parameter" id="param-st"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.14.0/dart-core/StackTrace-class.html">StackTrace</a>?</span> <span class="parameter-name">st</span></span>)</span></span>
 
     </section>
 
     
 <section class="desc markdown">
   <p>Signature for cache logging functions.</p>
-<p>Called when cache operations succeed or fail. Useful for debugging
-and monitoring cache health.</p>
+<p>The cache invokes it for selected backend, cleanup, and refresh failures.
+Successful operations are not logged.</p>
 </section>
 
     
@@ -93,7 +93,7 @@ and monitoring cache health.</p>
 <footer>
   <span class="no-break">
     typed_cache
-      0.3.1
+      0.4.0
   </span>
   
 </footer>

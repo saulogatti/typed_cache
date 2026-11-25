@@ -58,7 +58,7 @@
 <span class="name ">createTypedCache</span>&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends Object</span>&gt;(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="createTypedCache-param-backend"><span>required</span> <span class="type-annotation"><a href="../typed_cache/CacheBackend-class.html">CacheBackend</a></span> <span class="parameter-name">backend</span>, </span></li>
 <li><span class="parameter" id="createTypedCache-param-defaultCodec"><span>required</span> <span class="type-annotation"><a href="../typed_cache/CacheCodec-class.html">CacheCodec</a><span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D</span>&gt;</span></span> <span class="parameter-name">defaultCodec</span>, </span></li>
 <li><span class="parameter" id="createTypedCache-param-log"><span class="type-annotation"><a href="../typed_cache/CacheLogger.html">CacheLogger</a>?</span> <span class="parameter-name">log</span>, </span></li>
-<li><span class="parameter" id="createTypedCache-param-deleteCorruptedEntries"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.2/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">deleteCorruptedEntries</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="createTypedCache-param-deleteCorruptedEntries"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.14.0/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">deleteCorruptedEntries</span> = <span class="default-value">true</span>, </span></li>
 </ol>})
 
         
@@ -67,14 +67,12 @@
     
 <section class="desc markdown">
   <p>Creates a <a href="../typed_cache/TypedCache-class.html">TypedCache</a> instance with the given <code>backend</code>.</p>
-<p>Parameters:</p>
-<ul>
-<li><code>backend</code>: The storage backend (required)</li>
-<li><code>log</code>: Optional logger for debugging cache operations</li>
-<li><code>deleteCorruptedEntries</code>: If true, silently removes corrupted entries
-instead of throwing exceptions (default: true)</li>
-</ul>
-<p>Returns a fully configured <a href="../typed_cache/TypedCache-class.html">TypedCache</a> ready to use.</p>
+<p><code>defaultCodec</code> defines the encoded payload type <code>E</code> and domain type <code>D</code>.
+The system clock and default TTL policy are used.</p>
+<p>By default, expired, mismatched, or undecodable entries are treated as
+cache misses and are lazily deleted. Set <code>deleteCorruptedEntries</code> to
+<code>false</code> to surface type and decoding failures instead. <code>log</code> receives
+best-effort cleanup and invalidation failures.</p>
 </section>
 
 
@@ -86,14 +84,12 @@ instead of throwing exceptions (default: true)</li>
   required CacheCodec&lt;E, D&gt; defaultCodec,
   CacheLogger? log,
   bool deleteCorruptedEntries = true,
-}) {
-  return CacheStore(
-    backend: backend,
-    defaultCodec: defaultCodec,
-    logger: log,
-    deleteCorruptedEntries: deleteCorruptedEntries,
-  );
-}</code></pre>
+}) =&gt; CacheStore(
+  backend: backend,
+  defaultCodec: defaultCodec,
+  logger: log,
+  deleteCorruptedEntries: deleteCorruptedEntries,
+);</code></pre>
 </section>
 
 
@@ -120,7 +116,7 @@ instead of throwing exceptions (default: true)</li>
 <footer>
   <span class="no-break">
     typed_cache
-      0.3.1
+      0.4.0
   </span>
   
 </footer>

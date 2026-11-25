@@ -54,12 +54,12 @@
 
     <section class="multi-line-signature">
       
-<span class="returntype"><a href="https://api.dart.dev/stable/3.13.2/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">D</span>&gt;</span></span>
-<span class="name ">getOrFetch</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="getOrFetch-param-key"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.2/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, {</span></li>
-<li><span class="parameter" id="getOrFetch-param-fetch"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.2/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">D</span>&gt;</span></span> <span class="parameter-name">fetch</span>(), </span></li>
-<li><span class="parameter" id="getOrFetch-param-ttl"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.2/dart-core/Duration-class.html">Duration</a>?</span> <span class="parameter-name">ttl</span>, </span></li>
-<li><span class="parameter" id="getOrFetch-param-tags"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.2/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.13.2/dart-core/String-class.html">String</a></span>&gt;</span></span> <span class="parameter-name">tags</span>, </span></li>
-<li><span class="parameter" id="getOrFetch-param-allowExpiredWhileRevalidating"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.2/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowExpiredWhileRevalidating</span> = <span class="default-value">false</span>, </span></li>
+<span class="returntype"><a href="https://api.dart.dev/stable/3.14.0/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">D</span>&gt;</span></span>
+<span class="name ">getOrFetch</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="getOrFetch-param-key"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.14.0/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, {</span></li>
+<li><span class="parameter" id="getOrFetch-param-fetch"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/stable/3.14.0/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">D</span>&gt;</span></span> <span class="parameter-name">fetch</span>(), </span></li>
+<li><span class="parameter" id="getOrFetch-param-ttl"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.14.0/dart-core/Duration-class.html">Duration</a>?</span> <span class="parameter-name">ttl</span>, </span></li>
+<li><span class="parameter" id="getOrFetch-param-tags"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.14.0/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.14.0/dart-core/String-class.html">String</a></span>&gt;</span></span> <span class="parameter-name">tags</span>, </span></li>
+<li><span class="parameter" id="getOrFetch-param-allowExpiredWhileRevalidating"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.14.0/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowExpiredWhileRevalidating</span> = <span class="default-value">false</span>, </span></li>
 </ol>})
 
       
@@ -67,23 +67,17 @@
     </section>
     
 <section class="desc markdown">
-  <p>Gets a value from cache or fetches it if missing/expired.</p>
+  <p>Gets a value from the cache or fetches it when missing or expired.</p>
 <p>This is the primary method for cache-aside pattern:</p>
 <ol>
 <li>Try to get from cache</li>
 <li>If missing/expired, call <code>fetch</code> to get fresh data</li>
 <li>Store the result with optional <code>ttl</code> and <code>tags</code></li>
 </ol>
-<p>Parameters:</p>
-<ul>
-<li><code>key</code>: The cache key</li>
-<li><code>fetch</code>: Function that returns fresh data</li>
-<li><code>ttl</code>: Optional time-to-live for cached value</li>
-<li><code>tags</code>: Optional tags for grouped invalidation</li>
-<li><code>allowExpiredWhileRevalidating</code>: If true, returns expired cache while
-fetching fresh data in the background (stale-while-revalidate)</li>
-</ul>
-<p>Always returns a non-null value (either from cache or freshly fetched).</p>
+<p>When <code>allowExpiredWhileRevalidating</code> is <code>true</code> and a stale value exists,
+the refresh is attempted before that stale value is returned. A
+<a href="../../typed_cache/CacheBackendException-class.html">CacheBackendException</a> is logged; other errors from <code>fetch</code> propagate.</p>
+<p>The returned value is either cached or freshly fetched.</p>
 </section>
 
 
@@ -124,7 +118,7 @@ fetching fresh data in the background (stale-while-revalidate)</li>
 <footer>
   <span class="no-break">
     typed_cache
-      0.3.1
+      0.4.0
   </span>
   
 </footer>
