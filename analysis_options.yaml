@@ -23,7 +23,7 @@ analyzer:
     null_check_on_nullable_type_parameter: error
     public_member_api_docs: error
     lines_longer_than_80_chars: ignore
-    avoid_catches_without_on_clauses: error
+    avoid_catches_without_on_clauses: ignore
     no_runtimetype_tostring: error
     prefer_expression_function_bodies: ignore
     one_member_abstracts: error

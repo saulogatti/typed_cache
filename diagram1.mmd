@@ -1,0 +1,126 @@
+---
+references:
+  - "File: /example/cache_objects.dart"
+  - "File: /example/example.dart"
+  - "File: /lib/src/cache_store.dart"
+generationTime: 2026-11-25T09:55:21.998Z
+---
+classDiagram
+    direction TB
+
+    class CacheObject~T~ {
+        <<abstract>>
+        +String key
+        +T value
+        +CacheObject(String key, T value)
+    }
+
+    class IntCacheObject {
+        +IntCacheObject(String key, int value)
+    }
+
+    class StringCacheObject {
+        +StringCacheObject(String key, String value)
+    }
+
+    class MyObjectCacheObject {
+        +MyObjectCacheObject(String key, MyObject value)
+        +fromJson(Map json) MyObjectCacheObject$
+        +toJson() Map
+        +toString() String
+    }
+
+    class MyObject {
+        +String value
+        +MyObject(String value)
+        +toString() String
+    }
+
+    class TypedCache~E, D~ {
+        <<interface>>
+        +put(String key, D value, Duration ttl, Set tags) Future~void~
+        +get(String key) Future~D~
+        +getAll() Future~List~D~~
+        +clear() Future~void~
+        +remove(String key) Future~void~
+    }
+
+    class CacheBackend {
+        <<interface>>
+        +clear() Future~void~
+        +delete(String key) Future~void~
+        +read~E~(String key) Future~CacheEntry~E~~
+        +readAll~E~() Future~List~CacheEntry~E~~~
+        +write~E~(CacheEntry~E~ entry) Future~void~
+    }
+
+    class CacheCodec~E, D~ {
+        <<interface>>
+        +String typeId
+        +encode(D value) E
+        +decode(E data) D
+    }
+
+    class CacheStore~E, D~ {
+        -CacheBackend backend
+        -Clock clock
+        -TtlPolicy ttlPolicy
+        -CacheCodec~E, D~ defaultCodec
+        +clear() Future~void~
+        +contains(String key) Future~bool~
+        +get(String key) Future~D~
+        +getAll() Future~List~D~~
+        +put(String key, D value, Duration ttl, Set tags) Future~void~
+        +remove(String key) Future~void~
+        +purgeExpired() Future~int~
+    }
+
+    class InMemoryBackend {
+        -Map entries
+        +clear() Future~void~
+        +delete(String key) Future~void~
+        +read~E~(String key) Future~CacheEntry~E~~
+        +write~E~(CacheEntry~E~ entry) Future~void~
+    }
+
+    class MyObjectCodec {
+        +String typeId
+        +encode(MyObjectCacheObject value) Map
+        +decode(Map data) MyObjectCacheObject
+    }
+
+    class CacheEntry~E~ {
+        +String key
+        +String typeId
+        +E payload
+        +int createdAtEpochMs
+        +int expiresAtEpochMs
+        +Set~String~ tags
+        +isExpired(int nowEpochMs) bool
+    }
+
+    class Clock {
+        <<interface>>
+        +nowEpochMs() int
+    }
+
+    class TtlPolicy {
+        <<interface>>
+        +computeExpiresAtEpochMs(Duration ttl, Clock clock) int
+    }
+
+    CacheObject <|-- IntCacheObject : extends
+    CacheObject <|-- StringCacheObject : extends
+    CacheObject <|-- MyObjectCacheObject : extends
+    MyObjectCacheObject "1" *-- "1" MyObject : wraps
+
+    TypedCache <|.. CacheStore : implements
+    CacheBackend <|.. CacheStore : implements
+    CacheCodec <|.. MyObjectCodec : implements
+    CacheBackend <|.. InMemoryBackend : implements
+    CacheStore "1" *-- "1" InMemoryBackend : backend
+    CacheStore "1" *-- "1" MyObjectCodec : default codec
+    CacheStore "1" o-- "1" Clock : uses
+    CacheStore "1" o-- "1" TtlPolicy : uses
+    CacheBackend "1" o-- "*" CacheEntry : stores
+    InMemoryBackend "1" *-- "*" CacheEntry : entries

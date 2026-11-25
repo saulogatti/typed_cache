@@ -22,6 +22,21 @@ class IntCacheObject extends CacheObject<int> {
 class MyObjectCacheObject extends CacheObject<MyObject> {
   /// Creates a custom-object cache object.
   MyObjectCacheObject({required super.key, required super.value});
+
+  /// Creates a [MyObjectCacheObject] from a JSON payload.
+  factory MyObjectCacheObject.fromJson(Map<String, dynamic> json) {
+    final key = json['key'] as String;
+    final value = json['value'] as String;
+    return MyObjectCacheObject(key: key, value: MyObject(value));
+  }
+
+  /// Converts this cache object to a JSON payload.
+  Map<String, dynamic> toJson() => {'key': key, 'value': value.value};
+
+  @override
+  String toString() {
+    return 'MyObjectCacheObject(key: $key, value: ${value.value})';
+  }
 }
 
 /// Example cache object that contains a string.

@@ -18,8 +18,8 @@ void main() async {
     MyObjectCacheObject(key: 'my_object', value: MyObject('data to be cached')),
   );
   final myObject = await cache.get('my_object');
-  // ignore: unnecessary_statements
-  myObject?.value;
+  // ignore: avoid_print
+  print(myObject);
 }
 
 /// Minimal in-memory backend used only by this executable example.
@@ -66,7 +66,7 @@ class InMemoryBackend implements CacheBackend {
 
   @override
   Future<List<CacheEntry<E>>> readAll<E>() =>
-      Future.value(_entries.values.toList() as List<CacheEntry<E>>);
+      Future.value(_entries.values.toList().cast<CacheEntry<E>>());
 
   @override
   Future<void> write<E>(CacheEntry<E> entry) {
@@ -87,24 +87,16 @@ class MyObject {
   String toString() => '''MyObject(value: $value)''';
 }
 
-/// Converts cache objects to and from their illustrative string payload.
-class MyObjectCodec implements CacheCodec<String, CacheObject<MyObject>> {
+/// Converts cache objects to and from their illustrative JSON payload.
+class MyObjectCodec implements CacheCodec<Map<String, dynamic>, MyObjectCacheObject> {
   @override
   String get typeId => 'my_object';
 
   @override
-  CacheObject<MyObject> decode(String data) =>
-      MyObjectCacheObject(key: data, value: MyObject(data));
+  MyObjectCacheObject decode(Map<String, dynamic> data) => MyObjectCacheObject.fromJson(data);
 
   @override
-  String encode(CacheObject<MyObject> value) {
-    switch (value) {
-      case MyObjectCacheObject():
-        return value.key;
-      case StringCacheObject():
-        return value.value.toString();
-      case IntCacheObject():
-        return value.value.toString();
-    }
+  Map<String, dynamic> encode(MyObjectCacheObject value) {
+    return value.toJson();
   }
 }

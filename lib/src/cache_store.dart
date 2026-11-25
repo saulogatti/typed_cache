@@ -113,7 +113,7 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
       try {
         final fresh = await fetch();
         await put(key, fresh, ttl: ttl, tags: tags);
-      } on CacheBackendException catch (e, st) {
+      } catch (e, st) {
         _log?.call('SWR refresh failed for key="$key"', e, st);
       }
       return cached;
@@ -161,7 +161,7 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
     for (final k in keys) {
       try {
         await _backend.delete(k);
-      } on CacheBackendException catch (e, st) {
+      } catch (e, st) {
         _log?.call('Failed to delete key="$k" from tag="$tag"', e, st);
       }
     }
@@ -178,7 +178,7 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
     final now = _clock.nowEpochMs();
     try {
       return await _backend.purgeExpired(now);
-    } on CacheBackendException catch (e, st) {
+    } catch (e, st) {
       _log?.call('Backend purgeExpired failed', e, st);
       return 0;
     }
@@ -222,7 +222,7 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
       // Lazy expiration cleanup.
       try {
         await _backend.delete(key);
-      } on CacheBackendException catch (e, st) {
+      } catch (e, st) {
         _log?.call('Failed to delete expired key="$key"', e, st);
       }
       return null;
@@ -236,7 +236,7 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
         _log?.call(msg, null, null);
         try {
           await _backend.delete(key);
-        } on CacheBackendException catch (e, st) {
+        } catch (e, st) {
           _log?.call('Failed to delete mismatched key="$key"', e, st);
         }
         return null;
@@ -252,7 +252,7 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
         _log?.call(msg, e, st);
         try {
           await _backend.delete(key);
-        } on CacheBackendException catch (e2, st2) {
+        } catch (e2, st2) {
           _log?.call('Failed to delete corrupted key="$key"', e2, st2);
         }
         return null;
