@@ -1,0 +1,68 @@
+---
+references:
+  - "File: /lib/src/typed_cache.dart"
+generationTime: 2026-11-25T10:02:44.867Z
+---
+classDiagram
+    direction TB
+
+    class TypedCache~E, D~ {
+        <<interface>>
+        +CacheCodec~E, D~ defaultCodec
+        +clear() Future~void~
+        +contains(String key) Future~bool~
+        +get(String key, bool allowExpired) Future~D~
+        +getAll() Future~List~D~~
+        +getOrFetch(String key, Future~D~ fetch, Duration ttl, Set~String~ tags, bool allowExpiredWhileRevalidating) Future~D~
+        +getOrFetchWithResult(String key, Future~D~ fetch, Duration ttl, Set~String~ tags) Future~Result~D, CacheBackendException~~
+        +invalidateByTag(String tag) Future~void~
+        +purgeExpired() Future~int~
+        +put(String key, D value, Duration ttl, Set~String~ tags) Future~void~
+        +remove(String key) Future~void~
+    }
+
+    class CacheStore~E, D~ {
+        <<implementation>>
+    }
+
+    class CacheBackend {
+        <<interface>>
+    }
+
+    class CacheCodec~E, D~ {
+        <<interface>>
+    }
+
+    class CacheEntry~E~ {
+        <<data-type>>
+    }
+
+    class CacheLogger {
+        <<type>>
+    }
+
+    class Result~T, E~ {
+        <<data-type>>
+    }
+
+    class CacheBackendException {
+        <<exception>>
+    }
+
+    class CacheTypeMismatchException {
+        <<exception>>
+    }
+
+    class CacheDecodeException {
+        <<exception>>
+    }
+
+    CacheStore~E, D~ ..|> TypedCache~E, D~ : implements
+    TypedCache~E, D~ o-- "1" CacheCodec~E, D~ : uses default codec
+    TypedCache~E, D~ ..> CacheBackend : accesses through implementation
+    TypedCache~E, D~ ..> CacheEntry~E~ : uses
+    TypedCache~E, D~ ..> CacheLogger : optional logging
+    TypedCache~E, D~ ..> Result~T, E~ : returns
+    TypedCache~E, D~ ..> CacheBackendException : throws or returns
+    TypedCache~E, D~ ..> CacheTypeMismatchException : throws
+    TypedCache~E, D~ ..> CacheDecodeException : throws

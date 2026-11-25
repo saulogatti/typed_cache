@@ -96,12 +96,6 @@ abstract interface class TypedCache<E, D extends Object> {
     Set<String> tags,
   });
 
-  /// Removes a single entry by key.
-  ///
-  /// Use [remove] in new code.
-  @Deprecated('invalidate is deprecated, use remove instead')
-  Future<void> invalidate(String key);
-
   /// Removes all entries with the given [tag].
   ///
   /// Useful for grouped invalidation (e.g., invalidate all user-related

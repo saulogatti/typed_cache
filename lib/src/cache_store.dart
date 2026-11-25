@@ -150,10 +150,6 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
     }
   }
 
-  @Deprecated('invalidate is deprecated, use remove instead')
-  @override
-  Future<void> invalidate(String key) => remove(key);
-
   @override
   Future<void> invalidateByTag(String tag) async {
     final keys = (await _backend.keysByTag(tag)).toList();

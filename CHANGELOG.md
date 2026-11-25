@@ -2,6 +2,7 @@
 
 ## 0.4.0
 
+- Removed the deprecated `invalidate` method in favor of `remove`.
 - Added example usage for `StringCacheObject` and `IntCacheObject` as specialized cache objects.
 - Updated Dart SDK constraint to 3.14.0.
 - Fixed an issue with cache object serialization.
