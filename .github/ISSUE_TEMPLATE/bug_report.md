@@ -1,38 +1,35 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Report incorrect typed_cache behavior
 title: ''
-labels: ''
+labels: bug
 assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## Package version
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+State the `typed_cache` version and Dart SDK version.
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## Description
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+Describe the incorrect behavior and any exception, stack trace, or stale data
+observed.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+## Minimal reproduction
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+Provide the smallest `CacheBackend` and `CacheCodec` setup that reproduces the
+issue. Include the key, TTL, tags, and clock behavior when relevant.
 
-**Additional context**
-Add any other context about the problem here.
+```dart
+// Minimal reproduction
+```
+
+## Expected behavior
+
+Describe the result required by the public API contract.
+
+## Environment and additional context
+
+Include the operating system, backend implementation, and anything else needed
+to reproduce the issue. Do not include credentials or private cached data.

@@ -2,6 +2,10 @@ import 'package:typed_cache/typed_cache.dart';
 
 import 'cache_objects.dart';
 
+/// Runs a minimal illustrative cache workflow.
+///
+/// The in-memory backend below is intentionally small and is not a
+/// production storage recommendation.
 void main() async {
   final backend = InMemoryBackend();
   final cache = createTypedCache(
@@ -18,7 +22,9 @@ void main() async {
   myObject?.value;
 }
 
+/// Minimal in-memory backend used only by this executable example.
 class InMemoryBackend implements CacheBackend {
+  /// Creates an empty backend.
   InMemoryBackend();
 
   final Map<String, CacheEntry<dynamic>> _entries = {};
@@ -44,11 +50,16 @@ class InMemoryBackend implements CacheBackend {
   );
 
   @override
-  Future<int> purgeExpired(int nowEpochMs) => Future.value(
-    _entries.values
-        .where((entry) => entry.createdAtEpochMs + entry.expiresAtEpochMs! <= nowEpochMs)
-        .length,
-  );
+  Future<int> purgeExpired(int nowEpochMs) async {
+    final expiredKeys = _entries.entries
+        .where((entry) => entry.value.isExpired(nowEpochMs))
+        .map((entry) => entry.key)
+        .toList();
+    for (final key in expiredKeys) {
+      await delete(key);
+    }
+    return expiredKeys.length;
+  }
 
   @override
   Future<CacheEntry<E>?> read<E>(String key) async => _entries[key] as CacheEntry<E>?;
@@ -64,15 +75,19 @@ class InMemoryBackend implements CacheBackend {
   }
 }
 
+/// Domain value encoded by [MyObjectCodec].
 class MyObject {
+  /// Creates a value from [value].
   MyObject(this.value);
 
+  /// Encoded value used by the example.
   final String value;
 
   @override
   String toString() => '''MyObject(value: $value)''';
 }
 
+/// Converts cache objects to and from their illustrative string payload.
 class MyObjectCodec implements CacheCodec<String, CacheObject<MyObject>> {
   @override
   String get typeId => 'my_object';

@@ -1,20 +1,26 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
+about: Propose a typed_cache API or behavior
 title: ''
-labels: ''
+labels: enhancement
 assignees: ''
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+## Problem
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+Describe the caching scenario that the current API does not support.
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+## Proposed behavior
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+Explain the expected API, lifecycle, error behavior, and compatibility impact.
+Include a small Dart usage example when useful.
+
+## Alternatives
+
+Describe existing application-level workarounds and why they are insufficient.
+
+## Additional context
+
+Include backend or codec constraints that affect the design. Do not include
+credentials or private cached data.

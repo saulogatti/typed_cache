@@ -24,17 +24,12 @@ final class DefaultTtlPolicy implements TtlPolicy {
 /// Computes expiration timestamps for cache entries based on TTL.
 ///
 /// Implement this interface to customize TTL behavior (e.g., sliding windows,
-/// adaptive TTLs, or per-entry logic).
+/// adaptive expiration, or per-entry logic).
 abstract interface class TtlPolicy {
   /// Computes the expiration timestamp for an entry.
   ///
-  /// Parameters:
-  /// - [ttl]: The desired time-to-live, or null for no expiration
-  /// - [clock]: The current time source
-  ///
-  /// Returns:
-  /// - `null` if [ttl] is null (no expiration)
-  /// - Current time in ms if [ttl] is zero or negative (immediate expiration)
-  /// - Current time + ttl in ms otherwise
+  /// The returned value is in epoch milliseconds. A `null` result indicates
+  /// that the entry does not expire. Custom policies must consistently use the
+  /// supplied [clock] rather than reading system time directly.
   int? computeExpiresAtEpochMs({required Duration? ttl, required Clock clock});
 }
