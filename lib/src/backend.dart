@@ -1,4 +1,8 @@
-import 'entry.dart';
+/// @docImport 'package:typed_cache/src/errors.dart';
+/// @docImport 'package:typed_cache/src/typed_cache.dart';
+library;
+
+import 'package:typed_cache/src/entry.dart';
 
 /// Abstract interface for pluggable cache backends.
 ///
@@ -44,6 +48,11 @@ abstract interface class CacheBackend {
   /// reading fails (I/O errors, corruption, etc.).
   Future<CacheEntry<E>?> read<E>(String key);
 
+  /// Reads all cache entries.
+  ///
+  /// Returns a list of all cache entries.
+  ///
+  /// Throws [CacheBackendException] if reading fails.
   Future<List<CacheEntry<E>>> readAll<E>();
 
   /// Writes an encoded cache entry to the backend.

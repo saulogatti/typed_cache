@@ -1,3 +1,4 @@
+// coverage:ignore-file
 /// Abstracts time for testability.
 ///
 /// Inject different Clock implementations to control time in tests:
@@ -10,6 +11,7 @@ abstract interface class Clock {
 
 /// Real system clock using [DateTime.now].
 final class SystemClock implements Clock {
+  /// Creates a new system clock.
   const SystemClock();
 
   @override

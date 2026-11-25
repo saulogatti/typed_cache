@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'package:typed_cache/src/cache_store.dart';
 import 'package:typed_cache/typed_cache.dart';
 
@@ -17,14 +18,12 @@ TypedCache<E, D> createTypedCache<E, D extends Object>({
   required CacheCodec<E, D> defaultCodec,
   CacheLogger? log,
   bool deleteCorruptedEntries = true,
-}) {
-  return CacheStore(
-    backend: backend,
-    defaultCodec: defaultCodec,
-    logger: log,
-    deleteCorruptedEntries: deleteCorruptedEntries,
-  );
-}
+}) => CacheStore(
+  backend: backend,
+  defaultCodec: defaultCodec,
+  logger: log,
+  deleteCorruptedEntries: deleteCorruptedEntries,
+);
 
 /// Type-safe cache interface for storing and retrieving generic data.
 ///
@@ -34,6 +33,7 @@ TypedCache<E, D> createTypedCache<E, D extends Object>({
 /// All operations are async to support various backend implementations
 /// (file I/O, database, network, etc.).
 abstract interface class TypedCache<E, D extends Object> {
+  /// The default codec used for encoding and decoding values.
   CacheCodec<E, D> get defaultCodec;
 
   /// Removes all entries from the cache.

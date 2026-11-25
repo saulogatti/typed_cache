@@ -6,6 +6,17 @@
 /// - Timestamps for expiration logic
 /// - Optional tags for grouped invalidation
 class CacheEntry<E> {
+  /// Creates a new cache entry.
+  const CacheEntry({
+    /// The cache key (unique identifier within the backend).
+    required this.key,
+    required this.typeId,
+    required this.payload,
+    required this.createdAtEpochMs,
+    required this.expiresAtEpochMs,
+    required this.tags,
+  });
+
   /// The cache key (unique identifier within the backend).
   final String key;
 
@@ -24,15 +35,6 @@ class CacheEntry<E> {
   /// Optional tags for grouped invalidation (e.g., 'user:123', 'category:books').
   final Set<String> tags;
 
-  const CacheEntry({
-    required this.key,
-    required this.typeId,
-    required this.payload,
-    required this.createdAtEpochMs,
-    required this.expiresAtEpochMs,
-    required this.tags,
-  });
-
   /// Creates a copy with optionally updated fields (immutable builder).
   CacheEntry copyWith({
     E? payload,
@@ -40,16 +42,14 @@ class CacheEntry<E> {
     int? expiresAtEpochMs,
     Set<String>? tags,
     String? typeId,
-  }) {
-    return CacheEntry(
-      key: key,
-      typeId: typeId ?? this.typeId,
-      payload: payload ?? this.payload,
-      createdAtEpochMs: createdAtEpochMs ?? this.createdAtEpochMs,
-      expiresAtEpochMs: expiresAtEpochMs ?? this.expiresAtEpochMs,
-      tags: tags ?? this.tags,
-    );
-  }
+  }) => CacheEntry(
+    key: key,
+    typeId: typeId ?? this.typeId,
+    payload: payload ?? this.payload,
+    createdAtEpochMs: createdAtEpochMs ?? this.createdAtEpochMs,
+    expiresAtEpochMs: expiresAtEpochMs ?? this.expiresAtEpochMs,
+    tags: tags ?? this.tags,
+  );
 
   /// Checks if this entry has expired relative to [nowEpochMs].
   ///

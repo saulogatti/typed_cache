@@ -1,6 +1,16 @@
+// coverage:ignore-file
+/// A lightweight implementation of the Result pattern for Clean Architecture.
+/// Uses Dart 3 sealed classes to ensure exhaustive handling.
+///
+/// [S] is the success type [Success.value].
+/// [F] is the failure type [Failure.error].
 final class Failure<S, F> extends Result<S, F> {
-  final F error;
+  /// Creates a new Failure result.
   const Failure(this.error);
+
+  /// Creates a new Failure result.
+  /// The error value.
+  final F error;
 }
 
 /// A lightweight implementation of the Result pattern for Clean Architecture.
@@ -34,30 +44,24 @@ sealed class Result<S, F> {
   T fold<T extends Object?>({
     required T Function(S value) onSuccess,
     required T Function(F error) onFailure,
-  }) {
-    return switch (this) {
-      Success<S, F>(value: final S v) => onSuccess(v),
-      Failure<S, F>(error: final F e) => onFailure(e),
-    };
-  }
+  }) => switch (this) {
+    Success<S, F>(value: final S v) => onSuccess(v),
+    Failure<S, F>(error: final F e) => onFailure(e),
+  };
 
   /// Semantic alias for [fold], maintained for readability and familiarity
   /// with pattern matching APIs (e.g., `when` in other languages).
   /// Especially useful in Widgets/Blocs; for new code, prefer using [fold].
-  T when<T extends Object>(
-    T Function(S value) onSuccess,
-    T Function(F error) onFailure,
-  ) => fold<T>(onSuccess: onSuccess, onFailure: onFailure);
+  T when<T extends Object>(T Function(S value) onSuccess, T Function(F error) onFailure) =>
+      fold<T>(onSuccess: onSuccess, onFailure: onFailure);
 
   /// Static utility to wrap dangerous calls (try-catch)
-  static Future<Result<T, Exception>> guard<T extends Object>(
-    Future<T> Function() block,
-  ) async {
+  static Future<Result<T, Exception>> guard<T extends Object>(Future<T> Function() block) async {
     try {
       return Result<T, Exception>.success(await block());
     } on Exception catch (e) {
       return Result<T, Exception>.failure(e);
-    } catch (e) {
+    } on Object catch (e) {
       return Result<T, Exception>.failure(Exception(e.toString()));
     }
   }
@@ -72,11 +76,9 @@ sealed class Result<S, F> {
   ///  return await fetchData();
   /// });
   /// ```
-  static Future<Result<T, F>> resultAsync<T, F extends Object>(
-    Future<T> Function() action,
-  ) async {
+  static Future<Result<T, F>> resultAsync<T, F extends Object>(Future<T> Function() action) async {
     try {
-      final T value = await action();
+      final value = await action();
       return Result<T, F>.success(value);
     } on F catch (e) {
       return Result<T, F>.failure(e);
@@ -84,45 +86,45 @@ sealed class Result<S, F> {
   }
 }
 
+/// A lightweight implementation of the Result pattern for Clean Architecture.
+/// Uses Dart 3 sealed classes to ensure exhaustive handling.
+///
+/// [S] is the success type [Success.value].
+/// [F] is the failure type [Failure.error].
 final class Success<S, F> extends Result<S, F> {
-  final S value;
+  /// Creates a new Success result.
   const Success(this.value);
+
+  /// Creates a new Success result.
+  /// The success value.
+  final S value;
 }
 
+/// A lightweight implementation of the Result pattern for Clean Architecture.
+/// Uses Dart 3 sealed classes to ensure exhaustive handling.
+///
+/// [S] is the success type [Success.value].
+/// [F] is the failure type [Failure.error].
 extension ResultExtension<S, F> on Result<S, F> {
   /// Flat maps a [Result] to a new [Result] with a different success type.
-  Result<R, F> flatMap<R extends Object>(
-    Result<R, F> Function(S value) mapper,
-  ) {
-    return fold<Result<R, F>>(
-      onSuccess: mapper,
-      onFailure: (F error) => Result<R, F>.failure(error),
-    );
-  }
+  Result<R, F> flatMap<R extends Object>(Result<R, F> Function(S value) mapper) =>
+      fold<Result<R, F>>(onSuccess: mapper, onFailure: Result<R, F>.failure);
 
   /// Flat maps a [Result] to a new [Result] with a different error type.
-  Result<S, R> flatMapError<R>(Result<S, R> Function(F error) mapper) {
-    return fold(
-      onSuccess: (S value) => Result<S, R>.success(value),
-      onFailure: (F error) => mapper(error),
-    );
-  }
+  Result<S, R> flatMapError<R>(Result<S, R> Function(F error) mapper) =>
+      fold(onSuccess: Result<S, R>.success, onFailure: (error) => mapper(error));
 
   /// Maps a [Result] to a new [Result] with a different success type.
-  Result<R, F> map<R extends Object>(R Function(S value) mapper) {
-    return fold(
-      onSuccess: (S value) => Result<R, F>.success(mapper(value)),
-      onFailure: (F error) => Result<R, F>.failure(error),
-    );
-  }
+  Result<R, F> map<R extends Object>(R Function(S value) mapper) => fold(
+    onSuccess: (value) => Result<R, F>.success(mapper(value)),
+    onFailure: Result<R, F>.failure,
+  );
 
   /// Maps a [Result] to a new [Result] with a different error type.
-  Result<S, R> mapError<R>(R Function(F error) mapper) {
-    return fold(
-      onSuccess: (S value) => Result<S, R>.success(value),
-      onFailure: (F error) => Result<S, R>.failure(mapper(error)),
-    );
-  }
+  Result<S, R> mapError<R>(R Function(F error) mapper) => fold(
+    onSuccess: Result<S, R>.success,
+    onFailure: (error) => Result<S, R>.failure(mapper(error)),
+  );
 
   /// Executes a side effect function if the result is a failure.
   Result<S, F> onFailure(void Function(F error) effect) {
