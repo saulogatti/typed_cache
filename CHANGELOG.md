@@ -1,7 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.4.0
 
+- Added example usage for `StringCacheObject` and `IntCacheObject` as specialized cache objects.
+- Updated Dart SDK constraint to 3.14.0.
+- Fixed an issue with cache object serialization.
 - Corrected public API documentation and contributor guidance to match the
   current package behavior.
 
