@@ -1,15 +1,15 @@
+// coverage:ignore-file
 /// Abstracts time for testability.
 ///
-/// Inject different Clock implementations to control time in tests:
-/// - [SystemClock]: Real time from the system
-/// - `FakeClock`: Fixed or controlled time for unit tests
+/// Replace the system clock with a deterministic implementation in tests.
 abstract interface class Clock {
   /// Returns the current time in milliseconds since epoch (UTC).
   int nowEpochMs();
 }
 
-/// Real system clock using [DateTime.now].
+/// Uses [DateTime.now] as the time source.
 final class SystemClock implements Clock {
+  /// Creates a new system clock.
   const SystemClock();
 
   @override

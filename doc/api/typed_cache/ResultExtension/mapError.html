@@ -71,12 +71,10 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Result&lt;S, R&gt; mapError&lt;R&gt;(R Function(F error) mapper) {
-  return fold(
-    onSuccess: (S value) =&gt; Result&lt;S, R&gt;.success(value),
-    onFailure: (F error) =&gt; Result&lt;S, R&gt;.failure(mapper(error)),
-  );
-}</code></pre>
+  <pre class="language-dart"><code class="language-dart">Result&lt;S, R&gt; mapError&lt;R&gt;(R Function(F error) mapper) =&gt; fold(
+  onSuccess: Result&lt;S, R&gt;.success,
+  onFailure: (error) =&gt; Result&lt;S, R&gt;.failure(mapper(error)),
+);</code></pre>
 </section>
 
 
@@ -104,7 +102,7 @@
 <footer>
   <span class="no-break">
     typed_cache
-      0.3.1
+      0.4.0
   </span>
   
 </footer>

@@ -1,49 +1,32 @@
-import 'backend.dart';
-import 'codec.dart';
-import 'entry.dart';
-import 'errors.dart';
-import 'policy/clock.dart';
-import 'policy/ttl_policy.dart';
-import 'typed_cache.dart';
-import 'utils/typed_result.dart';
+import 'package:typed_cache/src/backend.dart';
+import 'package:typed_cache/src/codec.dart';
+import 'package:typed_cache/src/entry.dart';
+import 'package:typed_cache/src/errors.dart';
+import 'package:typed_cache/src/policy/clock.dart';
+import 'package:typed_cache/src/policy/ttl_policy.dart';
+import 'package:typed_cache/src/typed_cache.dart';
+import 'package:typed_cache/src/utils/typed_result.dart';
 
 /// Signature for cache logging functions.
 ///
-/// Called when cache operations succeed or fail. Useful for debugging
-/// and monitoring cache health.
+/// The cache invokes it for selected backend, cleanup, and refresh failures.
+/// Successful operations are not logged.
 typedef CacheLogger = void Function(String message, Object? error, StackTrace? st);
 
 /// Production [TypedCache] implementation.
 ///
-/// This class orchestrates the cache operations, delegating to:
-/// - [CacheBackend]: Persistent storage
-/// - [TtlPolicy]: Expiration logic
-/// - [Clock]: Time source
-///
-/// It handles:
-/// - Type validation via codec typeId
-/// - Lazy expiration (on access, not scheduled)
-/// - Corrupted entry cleanup
-/// - Error logging
+/// Storage is delegated to [CacheBackend], expiration is computed through
+/// [TtlPolicy], and time is obtained from [Clock]. Expiration is checked
+/// lazily during reads unless the caller explicitly purges entries.
 final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
-  final CacheBackend _backend;
-  final Clock _clock;
-  final TtlPolicy _ttlPolicy;
-  final CacheLogger? _log;
-  @override
-  final CacheCodec<E, D> defaultCodec;
-
-  /// If true, silently delete corrupted/mismatched entries instead of throwing.
-  final bool deleteCorruptedEntries;
-
   /// Creates a new cache instance.
   ///
-  /// Parameters:
-  /// - [_backend]: Required storage backend
-  /// - [_clock]: Time source (default: [SystemClock])
-  /// - [_ttlPolicy]: TTL computation strategy (default: [DefaultTtlPolicy])
-  /// - [logger]: Optional logging function
-  /// - [deleteCorruptedEntries]: Auto-delete corrupted entries (default: true)
+  /// [defaultCodec] applies to every value handled by this store.
+  ///
+  /// [_clock] and [_ttlPolicy] default to [SystemClock] and
+  /// [DefaultTtlPolicy]. They can be replaced when constructing the store
+  /// directly, primarily to make time-dependent behavior deterministic in
+  /// tests.
   CacheStore({
     required this._backend,
     required this.defaultCodec,
@@ -53,16 +36,31 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
     this.deleteCorruptedEntries = true,
   }) : _log = logger;
 
+  final CacheBackend _backend;
+  final Clock _clock;
+  final TtlPolicy _ttlPolicy;
+  final CacheLogger? _log;
+  @override
+  final CacheCodec<E, D> defaultCodec;
+
+  /// Whether mismatched or undecodable entries are deleted and treated as
+  /// misses.
+  final bool deleteCorruptedEntries;
+
   @override
   Future<void> clear() => _backend.clear();
   @override
   Future<bool> contains(String key) async {
     _validKey(key, false);
     final entry = await _backend.read<dynamic>(key);
-    if (entry == null) return false;
+    if (entry == null) {
+      return false;
+    }
 
     final now = _clock.nowEpochMs();
-    if (entry.isExpired(now)) return false;
+    if (entry.isExpired(now)) {
+      return false;
+    }
 
     return true;
   }
@@ -105,11 +103,13 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
   }) async {
     final cached = await get(key, allowExpired: allowExpiredWhileRevalidating);
 
-    if (cached != null && !allowExpiredWhileRevalidating) return cached;
+    if (cached != null && !allowExpiredWhileRevalidating) {
+      return cached;
+    }
 
     if (cached != null && allowExpiredWhileRevalidating) {
-      // Return stale but revalidate in the background.
-      // Note: This is best-effort; errors are logged but not propagated.
+      // Refresh synchronously before returning stale data.
+      // Backend refresh errors are logged; other fetch errors propagate.
       try {
         final fresh = await fetch();
         await put(key, fresh, ttl: ttl, tags: tags);
@@ -143,16 +143,12 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
       return Result.success(fresh);
     } on CacheBackendException catch (e) {
       return Result.failure(e);
-    } catch (e, st) {
+    } on Exception catch (e, st) {
       return Result.failure(
         CacheBackendException('Cache miss for key="$key" failed: $e', stackTrace: st),
       );
     }
   }
-
-  @Deprecated('invalidate is deprecated, use remove instead')
-  @override
-  Future<void> invalidate(String key) => remove(key);
 
   @override
   Future<void> invalidateByTag(String tag) async {
@@ -168,7 +164,7 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
     // Also remove the tag index if the backend supports it.
     try {
       await _backend.deleteTag(tag);
-    } catch (_) {
+    } on CacheBackendException catch (_) {
       // Silently ignore: backend may not support tag deletion.
     }
   }
@@ -202,10 +198,7 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
     try {
       await _backend.write<E>(entry);
     } catch (e, st) {
-      throw CacheBackendException(
-        'Backend write failed for key="$key": $e\n${st.toString()}',
-        stackTrace: st,
-      );
+      throw CacheBackendException('Backend write failed for key="$key": $e\n$st', stackTrace: st);
     }
   }
 
@@ -217,7 +210,9 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
 
   Future<D?> _makeData(CacheEntry<E>? entry, bool allowExpired, int now, String key) async {
     final codec = defaultCodec;
-    if (entry == null) return null;
+    if (entry == null) {
+      return null;
+    }
 
     if (!allowExpired && entry.isExpired(now)) {
       // Lazy expiration cleanup.
@@ -262,17 +257,10 @@ final class CacheStore<E, D extends Object> implements TypedCache<E, D> {
     }
   }
 
-  /// Validates that the cache key is non-empty.
-  /// Errors are either thrown or logged based on [errorOnEmpty].
-  /// put requires non-empty keys and will throw.
-  /// get, contains, and remove will log a warning but not throw.
-  /// for compatibility.
+  /// Validates [key], throwing or logging according to [errorOnEmpty].
   ///
-  /// @throws [CacheKeyEmptyException] if the key is empty.
-  ///
-  /// @param key The cache key to validate.
-  /// @param errorOnEmpty If true, throws an exception on empty key;
-  ///                     if false, logs a warning.
+  /// Write operations throw for an empty key. Read and removal operations log
+  /// the problem for compatibility, then continue with the original key.
   void _validKey(String key, bool errorOnEmpty) {
     if (key.isEmpty) {
       if (errorOnEmpty) {

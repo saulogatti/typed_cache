@@ -54,8 +54,8 @@
 
     <section class="multi-line-signature">
       
-<span class="returntype"><a href="https://api.dart.dev/stable/3.13.2/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../typed_cache/Result-class.html">Result</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">F</span>&gt;</span></span>&gt;</span></span>
-<span class="name ">resultAsync</span>&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">F extends Object</span>&gt;(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="resultAsync-param-action"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.2/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">action</span>()</span></li>
+<span class="returntype"><a href="https://api.dart.dev/stable/3.14.0/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../typed_cache/Result-class.html">Result</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">F</span>&gt;</span></span>&gt;</span></span>
+<span class="name ">resultAsync</span>&lt;<wbr><span class="type-parameter">T</span>, <span class="type-parameter">F extends Object</span>&gt;(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="resultAsync-param-action"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.14.0/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span> <span class="parameter-name">action</span>()</span></li>
 </ol>)
 
       
@@ -63,13 +63,10 @@
     </section>
     
 <section class="desc markdown">
-  <p>Asynchronous utility to create a Result from an async function
-that may throw an exception of type F.
-Type F must extend Object to ensure it is not null.
-Usage example:</p>
+  <p>Runs <code>action</code>, returning exceptions of type <code>F</code> as failures.</p>
+<p>Other thrown values propagate.</p>
 <pre class="language-dart"><code class="language-dart">final result = await Result.resultAsync&lt;MyType, MyException&gt;(() async {
-   // code that may throw MyException
- return await fetchData();
+  return fetchData();
 });
 </code></pre>
 </section>
@@ -78,11 +75,9 @@ Usage example:</p>
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static Future&lt;Result&lt;T, F&gt;&gt; resultAsync&lt;T, F extends Object&gt;(
-  Future&lt;T&gt; Function() action,
-) async {
+  <pre class="language-dart"><code class="language-dart">static Future&lt;Result&lt;T, F&gt;&gt; resultAsync&lt;T, F extends Object&gt;(Future&lt;T&gt; Function() action) async {
   try {
-    final T value = await action();
+    final value = await action();
     return Result&lt;T, F&gt;.success(value);
   } on F catch (e) {
     return Result&lt;T, F&gt;.failure(e);
@@ -115,7 +110,7 @@ Usage example:</p>
 <footer>
   <span class="no-break">
     typed_cache
-      0.3.1
+      0.4.0
   </span>
   
 </footer>

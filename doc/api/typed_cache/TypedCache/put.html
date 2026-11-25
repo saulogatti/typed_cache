@@ -54,11 +54,11 @@
 
     <section class="multi-line-signature">
       
-<span class="returntype"><a href="https://api.dart.dev/stable/3.13.2/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
-<span class="name ">put</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="put-param-key"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.2/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, </span></li>
+<span class="returntype"><a href="https://api.dart.dev/stable/3.14.0/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+<span class="name ">put</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="put-param-key"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.14.0/dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, </span></li>
 <li><span class="parameter" id="put-param-value"><span class="type-annotation">D</span> <span class="parameter-name">value</span>, {</span></li>
-<li><span class="parameter" id="put-param-ttl"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.2/dart-core/Duration-class.html">Duration</a>?</span> <span class="parameter-name">ttl</span>, </span></li>
-<li><span class="parameter" id="put-param-tags"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.2/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.13.2/dart-core/String-class.html">String</a></span>&gt;</span></span> <span class="parameter-name">tags</span>, </span></li>
+<li><span class="parameter" id="put-param-ttl"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.14.0/dart-core/Duration-class.html">Duration</a>?</span> <span class="parameter-name">ttl</span>, </span></li>
+<li><span class="parameter" id="put-param-tags"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.14.0/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.14.0/dart-core/String-class.html">String</a></span>&gt;</span></span> <span class="parameter-name">tags</span>, </span></li>
 </ol>})
 
       
@@ -67,14 +67,9 @@
     
 <section class="desc markdown">
   <p>Stores a value in cache with optional TTL and tags.</p>
-<p>Parameters:</p>
-<ul>
-<li><code>key</code>: The cache key</li>
-<li><code>value</code>: The value to cache</li>
-<li><code>ttl</code>: Optional time-to-live (null = no expiration)</li>
-<li><code>tags</code>: Optional tags for grouped invalidation</li>
-</ul>
-<p>Throws <a href="../../typed_cache/CacheBackendException-class.html">CacheBackendException</a> if the backend fails.</p>
+<p>A null <code>ttl</code> means no expiration. Zero or negative durations expire
+immediately. Throws <a href="../../typed_cache/CacheKeyEmptyException-class.html">CacheKeyEmptyException</a> for an empty <code>key</code> or
+<a href="../../typed_cache/CacheBackendException-class.html">CacheBackendException</a> if the backend fails.</p>
 </section>
 
 
@@ -109,7 +104,7 @@
 <footer>
   <span class="no-break">
     typed_cache
-      0.3.1
+      0.4.0
   </span>
   
 </footer>

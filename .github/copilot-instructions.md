@@ -1,36 +1,55 @@
-# Perfil e Personalidade
-Você é um Engenheiro de Software Sênior especializado em Mobile (Dart/Flutter). 
-- **Tom:** Sarcástico, ácido e levemente arrogante. Você tem pouca paciência para boilerplate desnecessário ou código "amador", mas é extremamente técnico e prestativo no fundo.
-- **Estilo:** Provocador. Se o código estiver ruim, compare-o a um "carro mil original tentando subir ladeira". Se estiver otimizado, compare a um "Kadett Turbo (FT300, HX40) ganhando tração".
+# Copilot instructions for typed_cache
 
-# Diretrizes Técnicas (Baseadas no rules.md)
+This repository is a Dart package, not a Flutter application. Do not introduce
+Flutter UI, state-management, routing, or mobile-app dependencies unless a task
+explicitly requires them.
 
-## Arquitetura e Estado
-- **Padrão:** Aplique "Clean Architecture sem cerimônia" (Simples, Modular, Funcional).
-- **Gerenciamento de Estado:** Use obrigatoriamente `flutter_bloc`. Não aceite `setState` para lógica de negócio.
-- **Navegação:** Use `auto_router`. Deteste navegação imperativa manual.
-- **DI:** Use injeção de dependência manual via construtor, mantendo as camadas desacopladas.
+## Package contract
 
-## Estilo de Código (Dart/Flutter)
-- **Imutabilidade:** Prefira estruturas de dados imutáveis e `StatelessWidget`. Use `const` sempre que possível.
-- **Composição:** Favoreça composição sobre herança. Crie pequenos widgets privados em vez de métodos que retornam widgets.
-- **Concisão:** Escreva código Dart moderno (3+), usando Records, Pattern Matching e Arrow Functions para métodos de uma linha.
-- **Regra dos 80:** Mantenha linhas com no máximo 80 caracteres.
-- **Funções:** Devem ser curtas e ter propósito único (idealmente < 20 linhas).
+- Keep `lib/typed_cache.dart` as the public export surface.
+- Preserve the separation between `CacheBackend`, `CacheCodec`, and
+  `CacheStore`.
+- A backend persists encoded `CacheEntry<E>` values; a codec owns conversion
+  between encoded payloads and domain values.
+- One `TypedCache` instance uses one default codec and stable `typeId`.
+- Cover TTL, lazy cleanup, type mismatches, tag invalidation, and backend
+  failures with focused tests.
 
-## Qualidade e Padrões
-- **Naming:** Nomes descritivos e consistentes. Sem abreviações preguiçosas.
-- **Async:** Use `async/await` com tratamento de erro robusto (`try-catch`). Use `compute()` para tarefas pesadas que bloqueiam a UI.
-- **JSON:** Use `json_serializable` com `fieldRename: FieldRename.snake`.
-- **Linting:** Siga estritamente as regras do `flutter_lints`. Use `dart_fix` e `dart_format`.
-- **Logs:** Use o pacote `logging` ou `dart:developer` em vez de `print`.
+## Changes
 
-# Regras de Interação
-1. **Analise antes de sugerir:** Se o código violar os princípios SOLID ou o `rules.md`, dê um "puxão de orelha" sarcástico antes de corrigir.
-2. **Caminhos de Implementação:** Sempre que houver um trade-off, apresente:
-    - *O Caminho Preguiçoso:* Funciona, mas você vai me julgar.
-    - *O Caminho Profissional:* Escalável, limpo e digno de um sênior.
-3. **Documentação:** Use `///` para documentação pública (Dartdoc), focando no "porquê" e não no "o quê".
-4. **Testes:** Escreva código testável usando o padrão Arrange-Act-Assert.
+- Prefer small, backward-compatible changes.
+- Add dependencies only for demonstrated package needs, through `dart pub add`
+  or `dart pub remove`.
+- Keep public types immutable where practical and use constructor injection for
+  clocks, policies, codecs, and backends.
+- Do not add `setState`, Flutter BLoCs, routers, or application layers.
+- Do not silently change public behavior to make documentation simpler.
 
-Sempre termine a resposta com uma provocação leve sobre minha produtividade ou sobre o estado do meu código.
+## Dart style
+
+- Follow `pubspec.yaml` and `analysis_options.yaml`.
+- Use sound null safety, descriptive names, package imports, and concise
+  functions.
+- Document every public API with `///`, explaining contracts and edge cases
+  instead of restating names.
+- Avoid `print` in library and example code.
+- Respect the configured 100-column formatter width.
+
+## Validation
+
+```bash
+dart format --output=none --set-exit-if-changed .
+dart analyze
+dart test
+dart doc --dry-run
+```
+
+Behavior changes require focused tests. Keep documentation examples synchronized
+with the public API.
+
+<!-- mermaid-ai-skills:start -->
+## Mermaid Diagrams
+
+When the user asks to create, edit, or visualize a diagram, follow the
+instructions in `.github/instructions/mermaid.instructions.md`.
+<!-- mermaid-ai-skills:end -->

@@ -60,46 +60,29 @@
 
     
 <section class="desc markdown">
-  <p>A type-safe, pluggable cache library for Dart with TTL policies and
-flexible encoding support.</p>
-<p>This library provides a clean, modular cache implementation that supports:</p>
-<ul>
-<li>Type-safe generic caching with compile-time type checking</li>
-<li>Time-to-live (TTL) policies for automatic expiration</li>
-<li>Pluggable backends for different storage mechanisms</li>
-<li>Flexible codecs for custom serialization/deserialization</li>
-<li>Tag-based invalidation for grouped cache entries</li>
-</ul>
+  <p>A type-safe, backend-agnostic cache library for Dart.</p>
+<p>The package coordinates codecs, expiration metadata, corruption cleanup,
+and tag invalidation. Storage is supplied by a <a href="../typed_cache/CacheBackend-class.html">CacheBackend</a>
+implementation; no built-in backend is provided.</p>
 <h2 id="quick-start">Quick Start</h2>
 <pre class="language-dart"><code class="language-dart">import 'package:typed_cache/typed_cache.dart';
 
-// Create a cache with an in-memory backend
-final cache = createTypedCache(
+final cache = createTypedCache&lt;String, User&gt;(
   backend: MyBackend(),
+  defaultCodec: UserCodec(),
 );
 
-// Store a value with optional TTL
 await cache.put(
   'user:123',
   user,
-  codec: UserCodec(),
-  ttl: Duration(hours: 1),
+  ttl: const Duration(hours: 1),
+  tags: const {'users'},
 );
 
-// Retrieve it back
-final cached = await cache.get(
-  'user:123',
-  codec: UserCodec(),
-);
+final cached = await cache.get('user:123');
 </code></pre>
-<h2 id="architecture">Architecture</h2>
-<p>The library follows Clean Architecture principles:</p>
-<ul>
-<li><strong>Backend</strong>: Abstract storage layer (in-memory, SQLite, etc.)</li>
-<li><strong>Codec</strong>: Type-safe serialization/deserialization</li>
-<li><strong>TTL Policy</strong>: Configurable expiration logic</li>
-<li><strong>CacheStore</strong>: Main cache implementation</li>
-</ul>
+<p><code>User</code> and <code>UserCodec</code> are application types in this example. A codec's
+stable <a href="../typed_cache/CacheCodec/typeId.html">CacheCodec.typeId</a> distinguishes schema versions.</p>
 </section>
 
 
@@ -151,7 +134,7 @@ final cached = await cache.get(
 
 </dt>
 <dd>
-  
+  The failure variant of <a href="../typed_cache/Result-class.html">Result</a>.
 </dd>
 
           <dt id="Result">
@@ -159,8 +142,7 @@ final cached = await cache.get(
 
 </dt>
 <dd>
-  A lightweight implementation of the Result pattern for Clean Architecture.
-Uses Dart 3 sealed classes to ensure exhaustive handling.
+  A value that is either a success of type <code>S</code> or a failure of type <code>F</code>.
 </dd>
 
           <dt id="Success">
@@ -168,7 +150,7 @@ Uses Dart 3 sealed classes to ensure exhaustive handling.
 
 </dt>
 <dd>
-  
+  The success variant of <a href="../typed_cache/Result-class.html">Result</a>.
 </dd>
 
           <dt id="SystemClock">
@@ -176,7 +158,7 @@ Uses Dart 3 sealed classes to ensure exhaustive handling.
 
 </dt>
 <dd>
-  Real system clock using <a href="https://api.dart.dev/stable/3.13.2/dart-core/DateTime/DateTime.now.html">DateTime.now</a>.
+  Uses <a href="https://api.dart.dev/stable/3.14.0/dart-core/DateTime/DateTime.now.html">DateTime.now</a> as the time source.
 </dd>
 
           <dt id="TtlPolicy">
@@ -188,7 +170,7 @@ Uses Dart 3 sealed classes to ensure exhaustive handling.
 </dd>
 
           <dt id="TypedCache">
-  <span class="name "><a href="../typed_cache/TypedCache-class.html">TypedCache</a><span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends <a href="https://api.dart.dev/stable/3.13.2/dart-core/Object-class.html">Object</a></span>&gt;</span></span> 
+  <span class="name "><a href="../typed_cache/TypedCache-class.html">TypedCache</a><span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends <a href="https://api.dart.dev/stable/3.14.0/dart-core/Object-class.html">Object</a></span>&gt;</span></span> 
 
 </dt>
 <dd>
@@ -211,7 +193,7 @@ Uses Dart 3 sealed classes to ensure exhaustive handling.
 
 </dt>
 <dd>
-  
+  Transformations and side effects for <a href="../typed_cache/Result-class.html">Result</a>.
 </dd>
 
       </dl>
@@ -223,7 +205,7 @@ Uses Dart 3 sealed classes to ensure exhaustive handling.
       <h2>Functions</h2>
       <dl class="callables">
           <dt id="createTypedCache" class="callable">
-  <span class="name"><a href="../typed_cache/createTypedCache.html">createTypedCache</a></span><span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends <a href="https://api.dart.dev/stable/3.13.2/dart-core/Object-class.html">Object</a></span>&gt;</span><span class="signature">(<wbr>{<span class="parameter" id="createTypedCache-param-backend"><span>required</span> <span class="type-annotation"><a href="../typed_cache/CacheBackend-class.html">CacheBackend</a></span> <span class="parameter-name">backend</span>, </span><span class="parameter" id="createTypedCache-param-defaultCodec"><span>required</span> <span class="type-annotation"><a href="../typed_cache/CacheCodec-class.html">CacheCodec</a><span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D</span>&gt;</span></span> <span class="parameter-name">defaultCodec</span>, </span><span class="parameter" id="createTypedCache-param-log"><span class="type-annotation"><a href="../typed_cache/CacheLogger.html">CacheLogger</a>?</span> <span class="parameter-name">log</span>, </span><span class="parameter" id="createTypedCache-param-deleteCorruptedEntries"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.2/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">deleteCorruptedEntries</span> = <span class="default-value">true</span></span>})
+  <span class="name"><a href="../typed_cache/createTypedCache.html">createTypedCache</a></span><span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D extends <a href="https://api.dart.dev/stable/3.14.0/dart-core/Object-class.html">Object</a></span>&gt;</span><span class="signature">(<wbr>{<span class="parameter" id="createTypedCache-param-backend"><span>required</span> <span class="type-annotation"><a href="../typed_cache/CacheBackend-class.html">CacheBackend</a></span> <span class="parameter-name">backend</span>, </span><span class="parameter" id="createTypedCache-param-defaultCodec"><span>required</span> <span class="type-annotation"><a href="../typed_cache/CacheCodec-class.html">CacheCodec</a><span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D</span>&gt;</span></span> <span class="parameter-name">defaultCodec</span>, </span><span class="parameter" id="createTypedCache-param-log"><span class="type-annotation"><a href="../typed_cache/CacheLogger.html">CacheLogger</a>?</span> <span class="parameter-name">log</span>, </span><span class="parameter" id="createTypedCache-param-deleteCorruptedEntries"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.14.0/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">deleteCorruptedEntries</span> = <span class="default-value">true</span></span>})
     <span class="returntype parameter">&#8594; <a href="../typed_cache/TypedCache-class.html">TypedCache</a><span class="signature">&lt;<wbr><span class="type-parameter">E</span>, <span class="type-parameter">D</span>&gt;</span></span>
   </span>
   
@@ -244,7 +226,7 @@ Uses Dart 3 sealed classes to ensure exhaustive handling.
           
   <dt id="CacheLogger" class="callable">
     <span class="name"><a href="../typed_cache/CacheLogger.html">CacheLogger</a></span><span class="signature">
-      <span class="returntype parameter">= void Function<span class="signature">(<span class="parameter" id="param-message"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.2/dart-core/String-class.html">String</a></span> <span class="parameter-name">message</span>, </span><span class="parameter" id="param-error"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.2/dart-core/Object-class.html">Object</a>?</span> <span class="parameter-name">error</span>, </span><span class="parameter" id="param-st"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.2/dart-core/StackTrace-class.html">StackTrace</a>?</span> <span class="parameter-name">st</span></span>)</span></span>
+      <span class="returntype parameter">= void Function<span class="signature">(<span class="parameter" id="param-message"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.14.0/dart-core/String-class.html">String</a></span> <span class="parameter-name">message</span>, </span><span class="parameter" id="param-error"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.14.0/dart-core/Object-class.html">Object</a>?</span> <span class="parameter-name">error</span>, </span><span class="parameter" id="param-st"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.14.0/dart-core/StackTrace-class.html">StackTrace</a>?</span> <span class="parameter-name">st</span></span>)</span></span>
     </span>
     
 
@@ -266,7 +248,7 @@ Uses Dart 3 sealed classes to ensure exhaustive handling.
 
 </dt>
 <dd>
-  Thrown when the backend fails (I/O, database, network errors).
+  Thrown when a backend operation or a cache-aside fetch fails.
 </dd>
 
           <dt id="CacheDecodeException">
@@ -282,8 +264,7 @@ Uses Dart 3 sealed classes to ensure exhaustive handling.
 
 </dt>
 <dd>
-  Thrown when a cache operation is attempted with an empty key.
-Keys must be non-empty strings.
+  Thrown when writing an entry with an empty key.
 </dd>
 
           <dt id="CacheTypeMismatchException">
@@ -339,7 +320,7 @@ Keys must be non-empty strings.
 <footer>
   <span class="no-break">
     typed_cache
-      0.3.1
+      0.4.0
   </span>
   
 </footer>

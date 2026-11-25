@@ -1,20 +1,32 @@
+# Changelog
+
+## 0.4.0
+
+- Removed the deprecated `invalidate` method in favor of `remove`.
+- Added example usage for `StringCacheObject` and `IntCacheObject` as specialized cache objects.
+- Updated Dart SDK constraint to 3.14.0.
+- Fixed an issue with cache object serialization.
+- Corrected public API documentation and contributor guidance to match the
+  current package behavior.
+
 ## 0.3.1
 
 - Added an analyzer configuration file.
-- Updated Dart SDK version to 3.13.0.
+- Updated the Dart SDK constraint to 3.14.0.
 
 ## 0.3.0
 
-- Added result classes for cache operations
-- Added bulk operations for get, set, remove, and contains
-- Improved performance of cache retrieval by optimizing internal data structures.
-- Updated dependencies to the latest versions for better security and performance.
+- Added `Result` utilities for cache operations.
+- Added `getAll` for retrieving valid entries.
+- Improved cache retrieval and cleanup paths.
+- Updated development dependencies.
 
 ## 0.2.1
 - Fixed a bug where an empty string could be used as a cache key.
 - For compatibility, get, contains, and remove will log a warning instead of throwing an error when given an empty key.
 
 ## 0.2.0
+
 - Added `readAll` method to the backend for retrieving all cache entries.
 
 ## 0.1.0

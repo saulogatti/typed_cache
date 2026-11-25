@@ -1,29 +1,10 @@
 /// A cache entry with metadata and type information.
 ///
-/// This is the internal representation stored by the backend. It includes:
-/// - The encoded payload (E)
-/// - Type identifier for runtime type checking
-/// - Timestamps for expiration logic
-/// - Optional tags for grouped invalidation
+/// Backends persist this value without decoding [payload]. [typeId] identifies
+/// the codec schema, while [expiresAtEpochMs] and [tags] support expiration and
+/// grouped invalidation.
 class CacheEntry<E> {
-  /// The cache key (unique identifier within the backend).
-  final String key;
-
-  /// The codec's typeId (for type mismatch detection).
-  final String typeId;
-
-  /// The encoded payload ready for storage.
-  final E payload;
-
-  /// When this entry was created (epoch milliseconds).
-  final int createdAtEpochMs;
-
-  /// When this entry expires, or null for no expiration (epoch ms).
-  final int? expiresAtEpochMs;
-
-  /// Optional tags for grouped invalidation (e.g., 'user:123', 'category:books').
-  final Set<String> tags;
-
+  /// Creates an entry around an already encoded payload.
   const CacheEntry({
     required this.key,
     required this.typeId,
@@ -33,27 +14,43 @@ class CacheEntry<E> {
     required this.tags,
   });
 
-  /// Creates a copy with optionally updated fields (immutable builder).
+  /// The key used to identify the entry within the backend.
+  final String key;
+
+  /// The stable schema identifier reported by the codec.
+  final String typeId;
+
+  /// The encoded payload ready for storage.
+  final E payload;
+
+  /// When this entry was created (epoch milliseconds).
+  final int createdAtEpochMs;
+
+  /// The expiration timestamp in epoch milliseconds, or `null` if permanent.
+  final int? expiresAtEpochMs;
+
+  /// Tags used for grouped invalidation.
+  final Set<String> tags;
+
+  /// Creates a copy, retaining fields whose replacement is `null`.
   CacheEntry copyWith({
     E? payload,
     int? createdAtEpochMs,
     int? expiresAtEpochMs,
     Set<String>? tags,
     String? typeId,
-  }) {
-    return CacheEntry(
-      key: key,
-      typeId: typeId ?? this.typeId,
-      payload: payload ?? this.payload,
-      createdAtEpochMs: createdAtEpochMs ?? this.createdAtEpochMs,
-      expiresAtEpochMs: expiresAtEpochMs ?? this.expiresAtEpochMs,
-      tags: tags ?? this.tags,
-    );
-  }
+  }) => CacheEntry(
+    key: key,
+    typeId: typeId ?? this.typeId,
+    payload: payload ?? this.payload,
+    createdAtEpochMs: createdAtEpochMs ?? this.createdAtEpochMs,
+    expiresAtEpochMs: expiresAtEpochMs ?? this.expiresAtEpochMs,
+    tags: tags ?? this.tags,
+  );
 
   /// Checks if this entry has expired relative to [nowEpochMs].
   ///
-  /// An entry is expired if `expiresAtEpochMs` is set and
+  /// An entry is expired when an expiration is present and
   /// `nowEpochMs >= expiresAtEpochMs`.
   bool isExpired(int nowEpochMs) {
     final exp = expiresAtEpochMs;

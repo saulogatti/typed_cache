@@ -1,45 +1,33 @@
-/// A type-safe, pluggable cache library for Dart with TTL policies and
-/// flexible encoding support.
+/// @docImport 'package:typed_cache/typed_cache.dart';
 ///
-/// This library provides a clean, modular cache implementation that supports:
-/// - Type-safe generic caching with compile-time type checking
-/// - Time-to-live (TTL) policies for automatic expiration
-/// - Pluggable backends for different storage mechanisms
-/// - Flexible codecs for custom serialization/deserialization
-/// - Tag-based invalidation for grouped cache entries
+/// A type-safe, backend-agnostic cache library for Dart.
+///
+/// The package coordinates codecs, expiration metadata, corruption cleanup,
+/// and tag invalidation. Storage is supplied by a [CacheBackend]
+/// implementation; no built-in backend is provided.
 ///
 /// ## Quick Start
 ///
 /// ```dart
 /// import 'package:typed_cache/typed_cache.dart';
 ///
-/// // Create a cache with an in-memory backend
-/// final cache = createTypedCache(
+/// final cache = createTypedCache<String, User>(
 ///   backend: MyBackend(),
+///   defaultCodec: UserCodec(),
 /// );
 ///
-/// // Store a value with optional TTL
 /// await cache.put(
 ///   'user:123',
 ///   user,
-///   codec: UserCodec(),
-///   ttl: Duration(hours: 1),
+///   ttl: const Duration(hours: 1),
+///   tags: const {'users'},
 /// );
 ///
-/// // Retrieve it back
-/// final cached = await cache.get(
-///   'user:123',
-///   codec: UserCodec(),
-/// );
+/// final cached = await cache.get('user:123');
 /// ```
 ///
-/// ## Architecture
-///
-/// The library follows Clean Architecture principles:
-/// - **Backend**: Abstract storage layer (in-memory, SQLite, etc.)
-/// - **Codec**: Type-safe serialization/deserialization
-/// - **TTL Policy**: Configurable expiration logic
-/// - **CacheStore**: Main cache implementation
+/// `User` and `UserCodec` are application types in this example. A codec's
+/// stable [CacheCodec.typeId] distinguishes schema versions.
 ///
 library;
 

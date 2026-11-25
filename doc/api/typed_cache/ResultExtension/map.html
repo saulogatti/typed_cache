@@ -71,12 +71,10 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Result&lt;R, F&gt; map&lt;R extends Object&gt;(R Function(S value) mapper) {
-  return fold(
-    onSuccess: (S value) =&gt; Result&lt;R, F&gt;.success(mapper(value)),
-    onFailure: (F error) =&gt; Result&lt;R, F&gt;.failure(error),
-  );
-}</code></pre>
+  <pre class="language-dart"><code class="language-dart">Result&lt;R, F&gt; map&lt;R extends Object&gt;(R Function(S value) mapper) =&gt; fold(
+  onSuccess: (value) =&gt; Result&lt;R, F&gt;.success(mapper(value)),
+  onFailure: Result&lt;R, F&gt;.failure,
+);</code></pre>
 </section>
 
 
@@ -104,7 +102,7 @@
 <footer>
   <span class="no-break">
     typed_cache
-      0.3.1
+      0.4.0
   </span>
   
 </footer>
