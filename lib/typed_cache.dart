@@ -1,3 +1,5 @@
+/// @docImport 'package:typed_cache/typed_cache.dart';
+///
 /// A type-safe, backend-agnostic cache library for Dart.
 ///
 /// The package coordinates codecs, expiration metadata, corruption cleanup,
